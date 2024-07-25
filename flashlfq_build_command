@@ -1,0 +1,1 @@
+singularity build tmp.sif docker://smithchemwisc/flashlfq:latest
