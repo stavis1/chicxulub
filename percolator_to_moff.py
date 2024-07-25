@@ -25,7 +25,7 @@ pout['CalcMass'] = [calcmass[i] for i in pout['PSMId']]
 mzml = pymzml.run.Reader(sample[:-5] + '.mzML')
 scan_rt = {s.ID:s.scan_time_in_minutes() for s in mzml}
 
-moff = pd.DataFrame({'peptide':[re.search('\.([A-Z]+)\.',re.sub(r'\[.+\]','',p)).group(1) for p in pout['peptide']],
+moff = pd.DataFrame({'peptide':[re.search(r'\.([A-Z]+)\.',re.sub(r'\[.+\]','',p)).group(1) for p in pout['peptide']],
                      'prot':pout['proteinIds'],
                      'mod_peptide':pout['peptide'],
                      'rt':[scan_rt[s] for s in pout['ScanNr']],
