@@ -39,7 +39,8 @@ psm_mass = {i:m for i,m in zip(psms.index, psms['Peptide Monoisotopic Mass'])}
 rtstart_idx = SortedList(zip(features['rtStart'], features.index))
 rtend_idx = SortedList(zip(features['rtEnd'], features.index))
 mass_idx = SortedList(zip(features['mass'], features.index))
-feature_intensity = {idx:i for idx,i in zip(features.index, features['intensitySum'])}
+features['intensityCorr'] = features['intensitySum']/features['charge']
+feature_intensity = {idx:i for idx,i in zip(features.index, features['intensityCorr'])}
 
 max_rt_width = max(features['rtEnd'] - features['rtStart'])
 
