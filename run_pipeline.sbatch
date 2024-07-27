@@ -8,8 +8,8 @@
 #SBATCH -c 8
 #SBATCH --mem=32g
 #SBATCH -J batch1_searches
-#SBATCH --output=batch1_searches_%j_%a.log
-#SBATCH --error=batch1_searches_%j_%a.log
+#SBATCH --output=batch1_searches_out_%j_%a.log
+#SBATCH --error=batch1_searches_err_%j_%a.log
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=stavis@vols.utk.edu
 #SBATCH --array=1-49
