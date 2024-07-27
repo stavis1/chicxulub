@@ -1,5 +1,6 @@
 channels:
   - defaults
+  - bioconda
 dependencies:
   - pandas=2.2.2
   - pymzml=2.5.10
