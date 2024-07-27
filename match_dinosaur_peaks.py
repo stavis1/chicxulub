@@ -34,6 +34,7 @@ psms = pd.read_csv(args.pout, sep = '\t')
 #build psm index dictionaries for fast lookup
 psm_rt = {i:r for i,r in zip(psms.index, psms['Scan Retention Time'])}
 psm_mass = {i:m for i,m in zip(psms.index, psms['Peptide Monoisotopic Mass'])}
+seq_prots = {s:p for s,p in zip(psms['Full Sequence'], psms['Protein Accession'])}
 
 #build feature indices for fast lookup
 rtstart_idx = SortedList(zip(features['rtStart'], features.index))
@@ -66,6 +67,7 @@ class peptide():
         self.seq = seq
         self.psm_indices = []
         self.features = set([])
+        self.proteins = seq_prots[self.seq]
     
     def add_psm(self, psm_index, features):
         self.psm_indices.append(psm_index)
@@ -81,7 +83,8 @@ class peptide():
         return (self.seq, 
                 self.intensity, 
                 ';'.join((str(i) for i in self.psm_indices)), 
-                ';'.join((str(i) for i in self.features)))
+                ';'.join((str(i) for i in self.features)),
+                self.proteins)
 
 class keydefaultdict(defaultdict):
     def __missing__(self, key):
@@ -113,6 +116,6 @@ for peptide in peptide_list:
 
 #report
 peptide_data = pd.DataFrame(np.array([p.report() for p in peptide_list]),
-                            columns = ('sequence', 'intensity', 'psm_indices', 'feature_indices'))
+                            columns = ('sequence', 'intensity', 'psm_indices', 'feature_indices', 'proteins'))
 peptide_data.to_csv(args.out, sep = '\t', index = False)
 
