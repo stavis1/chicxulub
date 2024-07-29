@@ -17,9 +17,9 @@ basenames = [re.search(r'(.+)\.[^\.]+\Z',f).group(1) for f in os.listdir() if f.
 jobs = [(faa, next((b for b in basenames if i in b), None)) for i,faa in zip(identifiers, faa_files)]
 jobs = [j for j in jobs if j[1] is not None]
 
-with open('faa_files.txt', 'w') as faa_out:
+with open('faa_list.txt', 'w') as faa_out:
     faa_out.write('\n'.join(j[0] for j in jobs))
-with open('base_names.txt', 'w') as bnames_out:
+with open('basename_list.txt', 'w') as bnames_out:
     bnames_out.write('\n'.join(j[0] for j in jobs))
 
 with open('run_pipeline.sbatch', 'r') as sbatch_in:

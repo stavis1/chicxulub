@@ -4,7 +4,7 @@ name=$(sed "${1}q;d" basename_list.txt)
 
 singularity run --fakeroot msconvert.sif wine msconvert --outfile $name.indexed.mzML $name.mzML
 conda run -p ~/search_env python clean_fasta.py $faa
-./comet.linux.exe -Pmegan_searches.params -Dfiltered_$faa $name.indexed.mzML
+./comet.linux.exe -Pcomet.params -Dfiltered_$faa $name.indexed.mzML
 grep -v -- 'nan' $name.indexed.pin > $name.filtered.pin
 singularity run percolator.sif percolator -U --reset-algorithm -m $name.pout $name.filtered.pin
 conda run -p ~/search_env python percolator_to_flashlfq.py $name.pout
