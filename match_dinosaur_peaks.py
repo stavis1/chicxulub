@@ -14,11 +14,19 @@ parser.add_argument('-p', '--pout', action = 'store', required = True,
                     help = 'A FlashLFQ input file.')
 parser.add_argument('-o', '--out', action = 'store', required = True,
                     help = 'The name of the output file.')
+parser.add_argument('--fdr', action = 'store', required = False, type = float, default = 0.01,
+                    help = 'The name of the output file.')
+parser.add_argument('--ppm', action = 'store', required = False, type = float, default = 10, 
+                    help = 'The name of the output file.')
+parser.add_argument('--charges', action = 'store', required = False, type = str, default = '1,2,3',
+                    help = 'The name of the output file.')
+parser.add_argument('--cores', action = 'store', required = False, type = int, default = -1,
+                    help = 'The name of the output file.')
 args = parser.parse_args()
-args.ppm = 10
-args.charges = [1,2,3]
-args.fdr = 0.01
-args.cores = 8
+args.charges = list(int(c) for c in args.charge.split(','))
+if args.cores < 1:
+    import os
+    args.cores = os.cpu_count()
 
 from multiprocessing import Pool
 from collections import defaultdict

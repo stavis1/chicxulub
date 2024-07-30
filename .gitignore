@@ -164,5 +164,7 @@ cython_debug/
 *.sif
 *.exe
 *.jar
-/env*
+env/*
 !env/*.yml
+exes/*
+!exes/*.def
