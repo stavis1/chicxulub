@@ -18,7 +18,7 @@ parser.add_argument('--fdr', action = 'store', required = False, type = float, d
                     help = 'The name of the output file.')
 parser.add_argument('--ppm', action = 'store', required = False, type = float, default = 10, 
                     help = 'The name of the output file.')
-parser.add_argument('--charges', action = 'store', required = False, type = str, default = '1,2,3',
+parser.add_argument('--charges', action = 'store', required = False, type = str, default = '1,2,3,4,5,6',
                     help = 'The name of the output file.')
 parser.add_argument('--cores', action = 'store', required = False, type = int, default = -1,
                     help = 'The name of the output file.')
@@ -37,6 +37,7 @@ import numpy as np
 
 #read in data
 features = pd.read_csv(args.dinosaur, sep = '\t')
+features = features[[c in args.charges for c in features['charge']]]
 psms = pd.read_csv(args.pout, sep = '\t')
 
 #build psm index dictionaries for fast lookup
