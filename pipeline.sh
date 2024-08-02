@@ -2,7 +2,7 @@
 faa=$(sed "${1}q;d" faa_list.txt)
 name=$(sed "${1}q;d" basename_list.txt)
 
-singularity run --fakeroot msconvert.sif wine msconvert --outfile $name.indexed.mzML $name.mzML
+singularity run --fakeroot msconvert.sif wine msconvert --outfile $name.indexed.mzML $name.raw
 conda run -p ~/search_env python clean_fasta.py $faa
 ./comet.linux.exe -Pcomet.params -Dfiltered_$faa $name.indexed.mzML
 grep -v -- 'nan' $name.indexed.pin > $name.filtered.pin
@@ -12,3 +12,4 @@ mkdir $name.results
 singularity run flashlfq.sif --thr 8 --idt $name.txt --rep ./ --out $name.results
 java -jar Dinosaur-1.2.0.free.jar --outDir=$name.results $name.indexed.mzML
 conda run -p ~/search_env python match_dinosaur_peaks.py -d $name.results/$name.indexed.features.tsv -p $name.txt -o $name.results/$name.peptide_AUC.tsv
+cp $name.results ../
