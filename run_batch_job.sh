@@ -22,6 +22,7 @@ fi
 cd $SCRIPT_DIR/exes/
 if [ ! -f comet.linux.exe ]; then
         wget https://github.com/UWPR/Comet/releases/download/v2024.01.1/comet.linux.exe
+	chmod +x comet.linux.exe
 fi
 
 if [ ! -f Dinosaur-1.2.0.free.jar ]; then
@@ -41,6 +42,7 @@ if [ ! -f percolator.sif ]; then
         singularity build --fakeroot percolator.sif percolator.def
 fi
 
+rm -r $1/tmp
 mkdir $1/tmp
 cd $1/tmp
 cp $SCRIPT_DIR/*.* ./
