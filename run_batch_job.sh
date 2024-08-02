@@ -46,6 +46,7 @@ cd $1/tmp
 cp $SCRIPT_DIR/*.* ./
 ln ../*.raw ./
 ln ../*.faa ./
+ln ../comet.params ./
 ln -s $SCRIPT_DIR/exes/* .
 
 conda run -p $SCRIPT_DIR/env/search_env python run_job.py
