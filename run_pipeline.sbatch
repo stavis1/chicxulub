@@ -12,6 +12,5 @@
 #SBATCH --error=batch1_searches_err_%j_%a.log
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=stavis@vols.utk.edu
-#SBATCH --array=1-49
 
 ./pipeline.sh $SLURM_ARRAY_TASK_ID
