@@ -37,7 +37,7 @@ if [ ! -f flashlfq.sif ]; then
 fi
 
 if [ ! -f percolator.sif ]; then
-	wget https://github.com/percolator/percolator/releases/download/rel-3-07-01/percolator-converters-v3-07-linux-amd64.deb
+	wget https://github.com/percolator/percolator/releases/download/rel-3-07-01/percolator-noxml-v3-07-linux-amd64.deb
         singularity build --fakeroot percolator.sif percolator.def
 fi
 
