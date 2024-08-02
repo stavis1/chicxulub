@@ -20,7 +20,7 @@ jobs = [j for j in jobs if j[1] is not None]
 with open('faa_list.txt', 'w') as faa_out:
     faa_out.write('\n'.join(j[0] for j in jobs))
 with open('basename_list.txt', 'w') as bnames_out:
-    bnames_out.write('\n'.join(j[0] for j in jobs))
+    bnames_out.write('\n'.join(j[1] for j in jobs))
 
 subprocess.run(f'sbatch --array=1-{len(jobs)} run_pipeline.sbatch', shell = True)
 
