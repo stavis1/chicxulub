@@ -23,7 +23,7 @@ parser.add_argument('--charges', action = 'store', required = False, type = str,
 parser.add_argument('--cores', action = 'store', required = False, type = int, default = -1,
                     help = 'The name of the output file.')
 args = parser.parse_args()
-args.charges = list(int(c) for c in args.charge.split(','))
+args.charges = list(int(c) for c in args.charges.split(','))
 if args.cores < 1:
     import os
     args.cores = os.cpu_count()
