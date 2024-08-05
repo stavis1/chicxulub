@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+\#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Mon Jul 22 16:02:31 2024
@@ -18,7 +18,7 @@ pout['charge'] = [int(re.search(r'(\d+)_\d+\Z', i).group(1)) for i in pout['PSMI
 pout = pout[pout['q-value'] < 0.01]
 pout = pout[[not 'DECOY' in p for p in pout['proteinIds']]]
 
-pin = pd.read_csv(sample[:-5]+'.pin', sep = '\t')
+pin = pd.read_csv(sample[:-5]+'.filtered.pin', sep = '\t')
 calcmass = {i:m for i,m in zip(pin['SpecId'], pin['CalcMass'])}
 pout['CalcMass'] = [calcmass[i] for i in pout['PSMId']]
 
