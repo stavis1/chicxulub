@@ -22,11 +22,11 @@ pin = pd.read_csv(sample[:-5]+'.filtered.pin', sep = '\t')
 calcmass = {i:m for i,m in zip(pin['SpecId'], pin['CalcMass'])}
 pout['CalcMass'] = [calcmass[i] for i in pout['PSMId']]
 
-mzml = pymzml.run.Reader(sample[:-5] + '.mzML')
+mzml = pymzml.run.Reader(sample[:-5] + '.indexed.mzML')
 scan_rt = {s.ID:s.scan_time_in_minutes() for s in mzml}
 
-flfq = pd.DataFrame({'File Name':[sample[:-5] + '.mzML']*pout.shape[0],
-                     'Base Sequence':[re.search('\.([A-Z]+)\.',re.sub(r'\[.+\]','',p)).group(1) for p in pout['peptide']],
+flfq = pd.DataFrame({'File Name':[sample[:-5] + '.indexed.mzML']*pout.shape[0],
+                     'Base Sequence':[re.search(r'\.([A-Z]+)\.',re.sub(r'\[.+\]','',p)).group(1) for p in pout['peptide']],
                      'Full Sequence':pout['peptide'],
                      'Peptide Monoisotopic Mass':pout['CalcMass'],
                      'Scan Retention Time':[scan_rt[s] for s in pout['ScanNr']],
