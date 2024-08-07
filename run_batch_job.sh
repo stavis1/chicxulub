@@ -15,8 +15,8 @@
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-if [ ! -d $SCRIPT_DIR/env/search_env ]; then
-	conda env create -p $SCRIPT_DIR/env/search_env -f $SCRIPT_DIR/env/search_env.yml
+if [ ! -d ~/.conda/envs/search_env ]; then
+	conda env create -n search_env -f $SCRIPT_DIR/env/search_env.yml
 fi
 
 cd $SCRIPT_DIR/exes/
@@ -51,4 +51,4 @@ ln ../*.faa ./
 ln ../comet.params ./
 ln -s $SCRIPT_DIR/exes/* .
 
-conda run -p $SCRIPT_DIR/env/search_env python run_job.py
+conda run -n search_env python run_job.py
