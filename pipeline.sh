@@ -9,6 +9,7 @@ grep -v -- 'nan' $name.indexed.pin > $name.filtered.pin
 singularity run percolator.sif percolator -U --reset-algorithm -m $name.pout $name.filtered.pin
 conda run -p ~/search_env python percolator_to_flashlfq.py $name.pout
 mkdir $name.results
+cp $name.pout $name.results
 singularity run flashlfq.sif --thr 8 --idt $name.txt --rep ./ --out $name.results
 java -jar Dinosaur-1.2.0.free.jar --outDir=$name.results $name.indexed.mzML
 conda run -p ~/search_env python match_dinosaur_peaks.py -d $name.results/$name.indexed.features.tsv -p $name.txt -o $name.results/$name.peptide_AUC.tsv
