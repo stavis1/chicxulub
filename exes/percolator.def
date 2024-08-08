@@ -7,4 +7,5 @@ From: ubuntu:latest
 %post
 	apt-get update && apt-get install -y libgomp1
 	apt install /percolator.deb
+	mkdir /data/
 	

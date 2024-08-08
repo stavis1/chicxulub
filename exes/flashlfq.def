@@ -1,0 +1,6 @@
+Bootstrap: docker
+
+From: smithchemwisc/flashlfq:latest
+
+%post
+	mkdir /data/

@@ -34,7 +34,7 @@ if [ ! -f msconvert.sif ]; then
 fi
 
 if [ ! -f flashlfq.sif ]; then
-        singularity build --fakeroot flashlfq.sif docker://smithchemwisc/flashlfq:latest
+        singularity build --fakeroot flashlfq.sif flashlfq.def
 fi
 
 if [ ! -f percolator.sif ]; then
