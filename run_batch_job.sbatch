@@ -33,10 +33,6 @@ if [ ! -f msconvert.sif ]; then
 	singularity build --fakeroot msconvert.sif docker://proteowizard/pwiz-skyline-i-agree-to-the-vendor-licenses:latest
 fi
 
-if [ ! -f flashlfq.sif ]; then
-        singularity build --fakeroot flashlfq.sif flashlfq.def
-fi
-
 if [ ! -f percolator.sif ]; then
 	wget https://github.com/percolator/percolator/releases/download/rel-3-07-01/percolator-noxml-v3-07-linux-amd64.deb
         singularity build --fakeroot percolator.sif percolator.def
