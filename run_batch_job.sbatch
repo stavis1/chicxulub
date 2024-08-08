@@ -7,7 +7,7 @@
 #SBATCH --nodes=1
 #SBATCH -c 8
 #SBATCH --mem=32g
-#SBATCH -J batch1_searches
+#SBATCH -J setup
 #SBATCH --output=setup_out_%j_%a.log
 #SBATCH --error=setup_err_%j_%a.log
 #SBATCH --mail-type=ALL
