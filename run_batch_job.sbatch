@@ -13,7 +13,8 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=stavis@vols.utk.edu
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+RBJ=$(find ./ -name run_batch_job.sbatch)
+SCRIPT_DIR=$( cd -- "$( dirname -- "${RBJ}" )" &> /dev/null && pwd )
 
 if [ ! -d ~/.conda/envs/search_env ]; then
 	conda env create -n search_env -f $SCRIPT_DIR/env/search_env.yml
