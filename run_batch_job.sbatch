@@ -26,10 +26,6 @@ if [ ! -f comet.linux.exe ]; then
 	chmod +x comet.linux.exe
 fi
 
-if [ ! -f Dinosaur-1.2.0.free.jar ]; then
-        wget https://github.com/fickludd/dinosaur/releases/download/1.2.0/Dinosaur-1.2.0.free.jar
-fi
-
 if [ ! -f msconvert.sif ]; then
 	singularity build --fakeroot msconvert.sif docker://proteowizard/pwiz-skyline-i-agree-to-the-vendor-licenses:latest
 fi
