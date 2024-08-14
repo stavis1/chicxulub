@@ -2,7 +2,7 @@ Bootstrap: docker
 From: ubuntu:latest
 
 %files
-	percolator-noxml-v3-07-linux-amd64.deb /percolator.deb
+	percolator-noxml-v3-06-linux-amd64.deb /percolator.deb
 
 %post
 	apt-get update && apt-get install -y libgomp1
