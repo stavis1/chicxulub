@@ -124,7 +124,6 @@ celerybeat.pid
 # Environments
 .env
 .venv
-env/
 venv/
 ENV/
 env.bak/
@@ -168,3 +167,8 @@ env/*
 !env/*.yml
 exes/*
 !exes/*.def
+test/*
+!test/Dockerfile
+
+.nextflow
+work/
