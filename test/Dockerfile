@@ -1,6 +1,8 @@
 FROM nathanhess/slurm:full-root
 
+#make bash the default shell
 RUN ln -sf /bin/bash /bin/sh
+
 #install nextflow
 RUN curl -s https://get.sdkman.io | bash && \
     source "/root/.sdkman/bin/sdkman-init.sh" && \
