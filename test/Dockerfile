@@ -22,11 +22,10 @@ RUN curl -s https://get.sdkman.io | bash && \
     chmod +x nextflow && \
     ./nextflow self-update
 
+#make nextflow available in $PATH
 USER root
 RUN mv nextflow /usr/local/bin
 USER docker
-
-#RUN chmod -R 777 /usr/local/bin
 
 # Install conda
 RUN wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh" && \
