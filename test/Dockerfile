@@ -3,6 +3,9 @@ FROM nathanhess/slurm:full
 # Run installation as root
 USER root
 
+# Set up slurm configuration
+COPY slurm.conf /etc/slurm/slurm.conf
+
 # Make bash the default shell
 RUN ln -sf /bin/bash /bin/sh
 
@@ -34,3 +37,4 @@ RUN wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/lat
 
 # Download git repo
 RUN git clone https://github.com/stavis1/proteomics_cluster_submission
+

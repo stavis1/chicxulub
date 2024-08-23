@@ -169,6 +169,7 @@ exes/*
 !exes/*.def
 test/*
 !test/Dockerfile
+!test/slurm.conf
 
 .nextflow
 work/
