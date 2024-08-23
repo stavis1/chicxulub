@@ -24,7 +24,46 @@ process setup_exes {
     """
 }
 
+process msconvert {
+    input:
+    val row
+
+    output:
+    path '*.mzML', emit: mzml
+
+    script:
+    """
+    $launchDir/wrap_docker.sh $launchDir $row.spectra
+    """
+
+    stub:
+    """
+    touch ${row.spectra}.mzML
+    """
+}
+
+process comet {
+    input:
+    val row
+    val mzml
+
+    output:
+    path '*.pin', emit: pin
+
+    script:
+    """
+    $launchDir/comet.linux.exe -P$launchDir/$row.params -D$launchDir/$row.sequences $mzml
+    """
+
+    stub:
+    """
+    touch test.pin
+    """
+}
+
 workflow {
     setup_exes()
+    msconvert(design)
+    pin = comet(design, msconvert.out.mzml)
 }
 
