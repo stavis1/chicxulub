@@ -4,15 +4,15 @@ design = Channel.of(file(params.design)).splitCsv(header : true, sep : '\t', str
 process setup_exes {
     output:
     val env_name, emit: env
-    path "$projectDir/exes/comet.linux.exe", emit: comet
-    path "$projectDir/exes/msconvert.sif", emit: msconvert
-    path "$projectDir/exes/percolator.sif", emit: percolator
+    val "$projectDir/exes/comet.linux.exe", emit: comet
+    val "$projectDir/exes/msconvert.sif", emit: msconvert
+    val "$projectDir/exes/percolator.sif", emit: percolator
 
     script:
-        env_name = 'search_env'
-        """
-        bash $projectDir/setup.sh
-        """
+    env_name = 'search_env'
+    """
+    bash $projectDir/setup.sh
+    """
 }
 
 process msconvert {
@@ -21,11 +21,12 @@ process msconvert {
     val msconvert
 
     output:
-    path "$launchDir/${row.spectra}.mzML", emit: mzml
+    path "${row.spectra}.mzML", emit: mzml
 
     script:
     """
     singularity run --fakeroot --containall -w --bind $launchDir:/data/ $msconvert wine msconvert --outdir /data/ --outfile ${row.spectra}.mzML /data/$row.spectra
+    mv $launchDir/${row.spectra}.mzML $workDir
     """
 }
 
@@ -36,16 +37,11 @@ process comet {
     val comet
 
     output:
-    path '*.pin', emit: pin
+    path "${mzml}.pin", emit: pin
 
     script:
     """
-    $comet -P$launchDir/$row.params -D$launchDir/$row.sequences $mzml
-    """
-
-    stub:
-    """
-    touch test.pin
+    $comet -P$launchDir/$row.params -D$launchDir/$row.sequences -N${mzml}.pin $mzml
     """
 }
 
