@@ -37,12 +37,14 @@ process comet {
     val comet
 
     output:
-    path pin, emit: pin
+    path "${pin}.pin", emit: pin
 
     script:
-    pin = "${mzml.getBaseName()}.pin"
+    pin = mzml.getName()
     """
     $comet -P$launchDir/$row.params -D$launchDir/$row.sequences -N$pin $mzml
+    grep -vE '[:space:]-?nan[:space:]' ${pin}.pin > tmp
+    mv tmp ${pin}.pin
     """
 }
 
