@@ -3,7 +3,7 @@ design = Channel.of(file(params.design)).splitCsv(header : true, sep : '\t', str
 
 process setup_exes {
     output:
-    var 'search_env' emit: env
+    val 'search_env' emit: env
     path "$projectDir/exes/comet.linux.exe" emit: comet
     path "$projectDir/exes/msconvert.sif" emit: msconvert
     path "$projectDir/exes/percolator.sif" emit: percolator
