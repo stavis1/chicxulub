@@ -2,9 +2,6 @@ params.design = "$launchDir/design.tsv"
 design = Channel.of(file(params.design)).splitCsv(header : true, sep : '\t', strip : true)
 
 process setup_exes {
-    output:
-    val true
-
     """
     if [ ! -d ~/.conda/envs/search_env ]; then
         conda env create -n search_env -f $projectDir/env/search_env.yml
@@ -65,9 +62,9 @@ process comet {
     """
 }
 
-workflow {
-    setup_exes()
-    msconvert(design, setup_exes)
+setup_exes()
+workflow {    
+    msconvert(design)
     pin = comet(design, msconvert.out.mzml)
 }
 
