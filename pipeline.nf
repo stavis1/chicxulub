@@ -3,10 +3,10 @@ design = Channel.of(file(params.design)).splitCsv(header : true, sep : '\t', str
 
 process setup_exes {
     output:
-    val env_name emit: env
-    path "$projectDir/exes/comet.linux.exe" emit: comet
-    path "$projectDir/exes/msconvert.sif" emit: msconvert
-    path "$projectDir/exes/percolator.sif" emit: percolator
+    val env_name, emit: env
+    path "$projectDir/exes/comet.linux.exe", emit: comet
+    path "$projectDir/exes/msconvert.sif", emit: msconvert
+    path "$projectDir/exes/percolator.sif", emit: percolator
 
     script:
         env_name = 'search_env'
