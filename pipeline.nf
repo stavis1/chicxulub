@@ -43,7 +43,7 @@ process comet {
     pin = mzml.getName()
     """
     $comet -P$launchDir/$row.params -D$launchDir/$row.sequences -N$pin $mzml
-    grep -vE '[:space:]-?nan[:space:]' ${pin}.pin > tmp
+    grep -vE '[[:space:]]-?nan[[:space:]]' ${pin}.pin > tmp
     mv tmp ${pin}.pin
     """
 }
