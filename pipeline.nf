@@ -2,6 +2,12 @@ params.design = "$launchDir/design.tsv"
 design = Channel.of(file(params.design)).splitCsv(header : true, sep : '\t', strip : true)
 
 process setup_exes {
+    output:
+    var 'search_env' emit: env
+    path "$projectDir/exes/comet.linux.exe" emit: comet
+    path "$projectDir/exes/msconvert.sif" emit: msconvert
+    path "$projectDir/exes/percolator.sif" emit: percolator
+
     """
     if [ ! -d ~/.conda/envs/search_env ]; then
         conda env create -n search_env -f $projectDir/env/search_env.yml
@@ -27,19 +33,14 @@ process setup_exes {
 process msconvert {
     input:
     val row
-    val wait_for_setup
+    val msconvert
 
     output:
-    path '*.mzML', emit: mzml
+    path "$launchDir/${row.spectra}.mzML", emit: mzml
 
     script:
     """
-    $launchDir/wrap_docker.sh $launchDir $row.spectra
-    """
-
-    stub:
-    """
-    touch ${row.spectra}.mzML
+    singularity run --fakeroot --containall -w --bind $launchDir:/data/ $msconvert wine msconvert --outdir /data/ --outfile ${row.spectra}.mzML /data/$row.spectra
     """
 }
 
@@ -47,13 +48,14 @@ process comet {
     input:
     val row
     val mzml
+    val comet
 
     output:
     path '*.pin', emit: pin
 
     script:
     """
-    $launchDir/comet.linux.exe -P$launchDir/$row.params -D$launchDir/$row.sequences $mzml
+    $comet -P$launchDir/$row.params -D$launchDir/$row.sequences $mzml
     """
 
     stub:
@@ -62,9 +64,10 @@ process comet {
     """
 }
 
-setup_exes()
+
 workflow {    
-    msconvert(design)
-    pin = comet(design, msconvert.out.mzml)
+    setup_exes()
+    msconvert(design, setup_exes.msconvert)
+    pin = comet(design, msconvert.out.mzml, setup_exes.comet)
 }
 
