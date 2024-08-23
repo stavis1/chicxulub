@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ ! -d ~/.conda/envs/search_env ]; then
-    conda env create -n search_env -f /home/docker/proteomics_cluster_submission/env/search_env.yml
+    conda env create -y -n search_env -f /home/docker/proteomics_cluster_submission/env/search_env.yml
 fi
 
 cd /home/docker/proteomics_cluster_submission/exes/
