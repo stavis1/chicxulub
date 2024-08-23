@@ -69,7 +69,7 @@ process comet {
 
 workflow {    
     setup_exes()
-    msconvert(design, setup_exes.msconvert)
-    pin = comet(design, msconvert.out.mzml, setup_exes.comet)
+    msconvert(design, setup_exes.out.msconvert)
+    pin = comet(design, msconvert.out.mzml, setup_exes.out.comet)
 }
 
