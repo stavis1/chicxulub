@@ -26,7 +26,7 @@ process msconvert {
     script:
     """
     singularity run --fakeroot --containall -w --bind $launchDir:/data/ $msconvert wine msconvert --outdir /data/ --outfile ${row.spectra}.mzML /data/$row.spectra
-    mv $launchDir/${row.spectra}.mzML $workDir
+    mv $launchDir/${row.spectra}.mzML ./
     """
 }
 
