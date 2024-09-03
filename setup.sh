@@ -1,10 +1,12 @@
 #!/bin/bash
 
+work_dir=$1
+cd $work_dir
 if [ ! -d ~/.conda/envs/search_env ]; then
-    conda env create -y -n search_env -f /home/docker/proteomics_cluster_submission/env/search_env.yml
+    conda env create -n search_env -f env/search_env.yml
 fi
 
-cd /home/docker/proteomics_cluster_submission/exes/
+cd $work_dir/exes/
 if [ ! -f comet.linux.exe ]; then
         wget https://github.com/UWPR/Comet/releases/download/v2024.01.1/comet.linux.exe
     chmod +x comet.linux.exe
