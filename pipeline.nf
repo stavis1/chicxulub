@@ -48,10 +48,36 @@ process comet {
     """
 }
 
+process percolator {
+    input:
+    val pin
+    val percolator
+
+    output
+    path "${pout}.pout", emit: pout
+
+    script:
+    pout = pin.getName()
+    """
+    singularity run --fakeroot --bind ./:/data/ -w $percolator  $pin
+    """
+
+}
+
+process results {
+    input:
+    path pout
+
+    script:
+    """
+    cp $pout $launchDir/$pout
+    """
+}
 
 workflow {    
     setup_exes()
     msconvert(design, setup_exes.out.msconvert)
-    pin = comet(design, msconvert.out.mzml, setup_exes.out.comet)
+    comet(design, msconvert.out.mzml, setup_exes.out.comet)
+    percolator(comet.out.pin, setup_exes.out.percolator)
 }
 
