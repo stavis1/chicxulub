@@ -17,23 +17,10 @@ fi
 
 #Build singularity contianer
 if [ ! -f msconvert.sif ]; then
-    singularity build --fakeroot msconvert.sif docker://proteowizard/pwiz-skyline-i-agree-to-the-vendor-licenses:latest
-    #Some clusters don't allow users to build containers so we fall back on remote builds
-    return_code=$?
-    if [ $return_code != 0 ]; then
-        singularity build --remote msconvert.sif docker://proteowizard/pwiz-skyline-i-agree-to-the-vendor-licenses:latest
-    fi
+    singularity build msconvert.sif docker://proteowizard/pwiz-skyline-i-agree-to-the-vendor-licenses:latest
 fi
 
 #Build percolator container
 if [ ! -f percolator.sif ]; then
-    singularity build --fakeroot percolator.sif percolator.def
-    return_code=$?
-    if [ $return_code != 0 ]; then
-        singularity build --remote percolator.sif percolator.def
-        return_code=$?
-        if [ $return_code != 0 ]; then
-            echo 'There appears to be something wrong with singularity remote builds. Try running "singularity remote login"'
-        fi
-    fi
+    singularity build percolator.sif docker://stavisvols/percolator_for_pipeline
 fi
