@@ -53,7 +53,7 @@ process percolator {
     val pin
     val percolator
 
-    output
+    output:
     path "${pout}.pout", emit: pout
 
     script:
