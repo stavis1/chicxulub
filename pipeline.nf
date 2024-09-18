@@ -11,7 +11,7 @@ process setup_exes {
     script:
     env_name = 'search_env'
     """
-    bash $projectDir/setup.sh
+    bash $projectDir/setup.sh $projectDir
     """
 }
 
