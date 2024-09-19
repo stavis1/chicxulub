@@ -25,7 +25,7 @@ process msconvert {
 
     script:
     """
-    singularity run --fakeroot --containall -w --bind $launchDir:/data/ $msconvert wine msconvert --outdir /data/ --outfile ${row.spectra}.mzML /data/$row.spectra
+    singularity run --containall --bind $launchDir:/data/ $msconvert wine msconvert --outdir /data/ --outfile ${row.spectra}.mzML /data/$row.spectra
     mv $launchDir/${row.spectra}.mzML ./
     """
 }
@@ -59,7 +59,7 @@ process percolator {
     script:
     pout = pin.getName()
     """
-    singularity run --fakeroot --bind ./:/data/ -w $percolator  $pin
+    singularity run --bind ./:/data/ $percolator  $pin
     """
 
 }
