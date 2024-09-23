@@ -17,7 +17,7 @@ fi
 
 #Build singularity contianer
 if [ ! -f msconvert.sif ]; then
-    singularity build msconvert.sif docker://proteowizard/pwiz-skyline-i-agree-to-the-vendor-licenses:latest
+    singularity build msconvert.sif docker://stavisvols/msconvert:latest
 fi
 
 #Build percolator container
