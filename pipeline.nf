@@ -54,12 +54,12 @@ process percolator {
     val percolator
 
     output:
-    path "${pout}.pout", emit: pout
+    path "${basename}.pout", emit: pout
 
     script:
-    pout = pin.getName()
+    basename = pin.getName()
     """
-    singularity run --bind ./:/data/ $percolator  $pin
+    singularity run --bind ./:/data/ $percolator  /data/$basename
     """
 
 }
