@@ -25,7 +25,9 @@ process msconvert {
 
     script:
     """
-    singularity run --bind \$(mktemp -d):/wineprefix64 $msconvert bash /run_msconvert.sh --outfile ${row.spectra}.mzML $row.spectra
+    wine_temp=\$(mktemp -d)
+    singularity run --containall --bind $launchDir:/data/ --bind \$wine_temp:/wineprefix64 $msconvert bash /run_msconvert.sh '--outdir /data/ --outfile ${row.spectra}.mzML /data/$row.spectra'
+    rm -rf \$wine_temp
     mv $launchDir/${row.spectra}.mzML ./
     """
 }
