@@ -53,22 +53,25 @@ process percolator {
     val percolator
 
     output:
-    path "${basename}.pout", emit: pout
+    path "${basename}.psms", emit: psms
+    path "${basename}.peptides", emit: peptides
 
     script:
     basename = pin.getName()
     """
-    singularity run --bind ./:/data/ $percolator percolator $basename
+    singularity run --containall --bind ./:/data/ $percolator percolator -K ; -m /data/${basename}.psms -r /data/${basename}.peptides /data/$basename
     """
 }
 
 process results {
     input:
-    path pout
+    path psms
+    path peptides
 
     script:
     """
-    cp $pout $launchDir/$pout
+    cp $psms $launchDir/$psms
+    cp $peptides $launchDir/$peptides
     """
 }
 
