@@ -7,6 +7,7 @@ process setup_exes {
     val "$projectDir/exes/comet.linux.exe", emit: comet
     val "$projectDir/exes/msconvert.sif", emit: msconvert
     val "$projectDir/exes/percolator.sif", emit: percolator
+    val "$projectDir/exes/xcms.sif", emit: xcms
 
     script:
     env_name = 'search_env'
@@ -63,17 +64,42 @@ process percolator {
     """
 }
 
+process xcms {
+    input:
+    val row
+    val xcms
+
+    output:
+    path "${row.spectra}.features", emit: features
+
+    script:
+    """
+    singularity run --bind ./:/data/ $xcms Rscript /xcms/xcms_quantify_features.R \\
+        --mzml ${row.spectra} \\
+        --output ${row.spectra}.features \\
+        --xcms_params ${row.xcms_params} \\
+        --peakmerge_params ${row.merge_params} \\
+        --algorithm xcms_cw
+    """
+}
+
 process results {
     input:
     path psms
     path peptides
+    path features
+    path intensities
 
     script:
     basename_psms = psms.getName()
     basename_peptides = peptides.getName()
+    basename_features = features.getName()
+    basename_intensities = intensities.getName()
     """
     cp $psms $launchDir/$basename_psms
     cp $peptides $launchDir/$basename_peptides
+    cp $features $launchDir/$basename_features
+    cp $intensities $launchDir/$basename_intensities
     """
 }
 
