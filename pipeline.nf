@@ -1,4 +1,5 @@
 params.design = "$launchDir/design.tsv"
+params.cys_alk = 'const'
 design = Channel.of(file(params.design)).splitCsv(header : true, sep : '\t', strip : true)
 
 process setup_exes {
@@ -8,6 +9,7 @@ process setup_exes {
     val "$projectDir/exes/msconvert.sif", emit: msconvert
     val "$projectDir/exes/percolator.sif", emit: percolator
     val "$projectDir/exes/xcms.sif", emit: xcms
+    val "$projectDir/exes/feature_mapper.sif", emit: feature_mapper
 
     script:
     env_name = 'search_env'
@@ -60,13 +62,18 @@ process percolator {
     script:
     basename = pin.getName()
     """
-    singularity run --bind ./:/data/ $percolator percolator -K ';' -m /data/${basename}.psms -r /data/${basename}.peptides /data/$basename
+    singularity run --bind ./:/data/ $percolator percolator \\
+        -K ';' \\
+        -m /data/${basename}.psms \\
+        -r /data/${basename}.peptides \\
+        /data/$basename
     """
 }
 
 process xcms {
     input:
     val row
+    path mzml
     val xcms
 
     output:
@@ -75,11 +82,35 @@ process xcms {
     script:
     """
     singularity run --bind ./:/data/ $xcms Rscript /xcms/xcms_quantify_features.R \\
-        --mzml ${row.spectra} \\
-        --output ${row.spectra}.features \\
-        --xcms_params ${row.xcms_params} \\
-        --peakmerge_params ${row.merge_params} \\
+        --mzml $mzml \\
+        --output ${mzml}.features \\
+        --xcms_params $row.xcms_params \\
+        --peakmerge_params $row.merge_params \\
         --algorithm xcms_cw
+    """
+}
+
+process feature_mapper {
+    input:
+    val feature_mapper
+    path mzml
+    path features
+    path peptides
+    path psms
+
+    output:
+    path "${basename_peptides}.intensities", emit: intensities
+
+    script:
+    basename_peptides = peptides.getName()
+    """
+    singularity run --bin ./:/data/ $feature_mapper python /mapper/feature_mapper.py \\
+        --features $features \\
+        --peptide $peptides \\
+        --psms $psms \\
+        --mzml $mzml \\
+        --varaible_c_alk $params.cys_alk \\
+        --output ${basename_peptides}.intensities
     """
 }
 
@@ -104,9 +135,26 @@ process results {
 }
 
 workflow {    
+    //download necessary tools and containers
     setup_exes()
+    
+    //identification
     msconvert(design, setup_exes.out.msconvert)
     comet(design, msconvert.out.mzml, setup_exes.out.comet)
     percolator(comet.out.pin, setup_exes.out.percolator)
+    
+    //quantification
+    xcms(design, msconvert.out.mzml, setup_exes.out.xcms)
+    feature_mapper(setup_exes.out.feature_mapper, 
+                   msconvert.out.mzml, 
+                   xcms.out.features, 
+                   percolator.out.peptides, 
+                   percolator.out.psms)
+
+    //move results files back to launch directory
+    results(percolator.out.psms, 
+            percolator.out.peptides, 
+            xcms.out.features, 
+            feature_mapper.out.intensities)
 }
 
