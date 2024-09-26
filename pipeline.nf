@@ -59,7 +59,7 @@ process percolator {
     script:
     basename = pin.getName()
     """
-    singularity run --bind ./:/data/ $percolator percolator -K ; -m /data/${basename}.psms -r /data/${basename}.peptides /data/$basename
+    singularity run --bind ./:/data/ $percolator percolator -K ';' -m /data/${basename}.psms -r /data/${basename}.peptides /data/$basename
     """
 }
 
