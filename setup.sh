@@ -22,5 +22,15 @@ fi
 
 #Build percolator container
 if [ ! -f percolator.sif ]; then
-    singularity build percolator.sif docker://stavisvols/percolator_for_pipeline
+    singularity build percolator.sif docker://stavisvols/percolator_for_pipeline:latest
+fi
+
+#Build xcms container
+if [ ! -f xcms.sif ]; then
+    singularity build xcms.sif docker://stavisvols/xcms_quantify_features:latest
+fi
+
+#Build feature mapper container
+if [ ! -f feature_mapper.sif ]; then
+    singularity build feature_mapper.sif docker://stavisvols/feature_mapper:latest
 fi
