@@ -49,7 +49,7 @@ process comet {
 
 process percolator {
     input:
-    val pin
+    path pin
     val percolator
 
     output:
@@ -58,9 +58,8 @@ process percolator {
     script:
     basename = pin.getName()
     """
-    singularity run $percolator $pin
+    singularity run --bind ./:/data/ $percolator $basename
     """
-
 }
 
 process results {
