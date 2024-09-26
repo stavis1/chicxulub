@@ -69,9 +69,11 @@ process results {
     path peptides
 
     script:
+    basename_psms = psms.getName()
+    basename_peptides = peptides.getName()
     """
-    cp $psms $launchDir/$psms
-    cp $peptides $launchDir/$peptides
+    cp $psms $launchDir/$basename_psms
+    cp $peptides $launchDir/$basename_peptides
     """
 }
 
