@@ -121,26 +121,6 @@ process feature_mapper {
     """
 }
 
-process results {
-    input:
-    path psms
-    path peptides
-    path features
-    path intensities
-
-    script:
-    basename_psms = psms.getName()
-    basename_peptides = peptides.getName()
-    basename_features = features.getName()
-    basename_intensities = intensities.getName()
-    """
-    cp $psms $launchDir/$basename_psms
-    cp $peptides $launchDir/$basename_peptides
-    cp $features $launchDir/$basename_features
-    cp $intensities $launchDir/$basename_intensities
-    """
-}
-
 workflow {    
     //download necessary tools and containers
     setup_exes()
@@ -157,11 +137,5 @@ workflow {
                    xcms.out.features, 
                    percolator.out.peptides, 
                    percolator.out.psms)
-
-    //move results files back to launch directory
-    results(percolator.out.psms, 
-            percolator.out.peptides, 
-            xcms.out.features, 
-            feature_mapper.out.intensities)
 }
 
