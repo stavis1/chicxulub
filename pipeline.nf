@@ -20,14 +20,14 @@ process setup_exes {
 }
 
 process msconvert {
-    publishDir params.results_dir, mode: 'symlink'
+    publishDir params.results_dir, mode: 'symlink', pattern '*.mzML'
 
     input:
     val row
     val msconvert
 
     output:
-    path "${row.spectra}.mzML", emit: mzml
+    tuple val(row), path("${row.spectra}.mzML"), emit: mzml
 
     script:
     """
@@ -37,12 +37,11 @@ process msconvert {
 
 process comet {
     input:
-    val row
-    val mzml
+    tuple val(row), path(mzml)
     val comet
 
     output:
-    path "${pin}.pin", emit: pin
+    tuple val(row), path(mzml), path("${pin}.pin"), emit: pin
 
     script:
     pin = mzml.getName()
@@ -54,16 +53,15 @@ process comet {
 }
 
 process percolator {
-    publishDir params.results_dir, mode: 'copy'
+    publishDir params.results_dir, mode: 'copy', pattern '*.p*'
 
     input:
-    path pin
+    tuple val(row), path(mzml), path(pin)
     val percolator
 
     output:
-    path "${basename}.psms", emit: psms
-    path "${basename}.peptides", emit: peptides
-
+    tuple val(row), path(mzml), path(pin), path("${basename}.psms"), path("${basename}.peptides"), emit: pout
+    
     script:
     basename = pin.getName()
     """
@@ -77,12 +75,11 @@ process percolator {
 
 process xcms {
     input:
-    val row
-    path mzml
+    tuple val(row), path(mzml), path(pin), path(psms), path(peptides)
     val xcms
 
     output:
-    path "${row.spectra}.features", emit: features
+    tuple val(row), path(mzml), path(pin), path(psms), path(peptides), path("${row.spectra}.features"), emit: features
 
     script:
     """
@@ -97,17 +94,14 @@ process xcms {
 }
 
 process feature_mapper {
-    publishDir params.results_dir, mode: 'copy'
+    publishDir params.results_dir, mode: 'copy', pattern '*.intensities'
 
     input:
+    tuple val(row), path(mzml), path(pin), path(psms), path(peptides), path(features)
     val feature_mapper
-    path mzml
-    path features
-    path peptides
-    path psms
 
     output:
-    path "${basename_peptides}.intensities", emit: intensities
+    tuple val(row), path(mzml), path(pin), path(psms), path(peptides), path(features), path("${basename_peptides}.intensities"), emit: intensities
 
     script:
     basename_peptides = peptides.getName()
@@ -128,15 +122,11 @@ workflow {
     
     //identification
     msconvert(design, setup_exes.out.msconvert)
-    comet(design, msconvert.out.mzml, setup_exes.out.comet)
+    comet(msconvert.out.mzml, setup_exes.out.comet)
     percolator(comet.out.pin, setup_exes.out.percolator)
     
     //quantification
-    xcms(design, msconvert.out.mzml, setup_exes.out.xcms)
-    feature_mapper(setup_exes.out.feature_mapper, 
-                   msconvert.out.mzml, 
-                   xcms.out.features, 
-                   percolator.out.peptides, 
-                   percolator.out.psms)
+    xcms(percolator.out.pout, setup_exes.out.xcms)
+    feature_mapper(xcms.out.features, setup_exes.out.feature_mapper)
 }
 
