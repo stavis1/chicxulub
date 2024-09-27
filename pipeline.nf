@@ -1,5 +1,6 @@
 params.design = "$launchDir/design.tsv"
 params.cys_alk = 'const'
+params.results_dir = launchDir
 design = Channel.of(file(params.design)).splitCsv(header : true, sep : '\t', strip : true)
 
 process setup_exes {
@@ -19,6 +20,8 @@ process setup_exes {
 }
 
 process msconvert {
+    publishDir params.results_dir, mode: 'symlink'
+
     input:
     val row
     val msconvert
@@ -51,6 +54,8 @@ process comet {
 }
 
 process percolator {
+    publishDir params.results_dir, mode: 'copy'
+
     input:
     path pin
     val percolator
@@ -91,6 +96,8 @@ process xcms {
 }
 
 process feature_mapper {
+    publishDir params.results_dir, mode: 'copy'
+
     input:
     val feature_mapper
     path mzml
