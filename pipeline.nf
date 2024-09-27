@@ -106,7 +106,7 @@ process feature_mapper {
     script:
     basename_peptides = peptides.getName()
     """
-    singularity run --bin ./:/data/ $feature_mapper python /mapper/feature_mapper.py \\
+    singularity run --bind ./:/data/ $feature_mapper python /mapper/feature_mapper.py \\
         --features $features \\
         --peptide $peptides \\
         --psms $psms \\
