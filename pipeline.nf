@@ -86,12 +86,7 @@ process xcms {
 
     script:
     """
-    singularity run --bind ./:/data/ $xcms Rscript /xcms/xcms_quantify_features.R \\
-        --mzml $mzml \\
-        --output ${mzml}.features \\
-        --xcms_params $launchDir/$row.xcms_params \\
-        --peakmerge_params $launchDir/$row.merge_params \\
-        --algorithm xcms_cw
+    $projectDir/xcms.sh $mzml $xcms $launchDir/$row.xcms_params $launchDir/$row.merge_params
     """
 }
 
