@@ -95,9 +95,9 @@ def peptide_rollup(features, psms):
     '''
     arguments:
         features (a dataframe) must have columns: rt_start, rt_end, mz, intensity
-        psms (a dataframe) must have columns: mass, rt, sequence
+        psms (a dataframe) must have columns: mass, rt, sequence, proteinIds
     returns:
-        a dataframe with columns: sequence, intensity
+        a dataframe with columns: sequence, intensity, proteins
     note that retention time should be in minutes
     '''
     
@@ -120,9 +120,13 @@ def peptide_rollup(features, psms):
     with Pool(params['cores']) as p:
         feature_map = p.map(map_feature, psms.index)
     
+    #set up sequence to proteins mapping
+    seq_prots = {s:p for s,p in zip(psms['sequence'], psms['proteinIds'])}
+
     class peptide():
         def __init__(self, seq):
             self.seq = seq
+            self.prots = seq_prots[seq]
             self.psm_indices = []
             self.features = set([])
         
@@ -138,8 +142,9 @@ def peptide_rollup(features, psms):
         
         def report(self):
             return (self.seq, 
-                    self.intensity)
-    
+                    self.intensity,
+                    self.prots)
+        
     #initialize peptide objects
     peptides = keydefaultdict(peptide)
     for seq, psm, feature_set in zip(psms['sequence'], psms.index, feature_map):
@@ -163,7 +168,7 @@ def peptide_rollup(features, psms):
     
     #make results dataframe
     peptide_data = pd.DataFrame([p.report() for p in peptide_list],
-                                columns = ('sequence', 'intensity'))
+                                columns = ('sequence', 'intensity', 'proteins'))
     return peptide_data
 
 @cache
@@ -216,4 +221,4 @@ psms['scan'] = [int(re.search(r'(\d+)_\d+_\d+\Z', i).group(1)) for i in psms['PS
 psms['rt'] = [scan_rt[s] for s in psms['scan']]
 
 intensities = peptide_rollup(features, psms)
-intensities.to_csv(args.output)
+intensities.to_csv(args.output, sep = '\t', index = False)
