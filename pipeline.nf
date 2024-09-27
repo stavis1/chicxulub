@@ -79,7 +79,7 @@ process xcms {
     val xcms
 
     output:
-    tuple val(row), path(mzml), path(pin), path(psms), path(peptides), path("${row.spectra}.features"), emit: features
+    tuple val(row), path(mzml), path(pin), path(psms), path(peptides), path("${mzml}.features"), emit: features
 
     script:
     """
