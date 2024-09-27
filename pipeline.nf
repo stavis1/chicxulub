@@ -20,7 +20,7 @@ process setup_exes {
 }
 
 process msconvert {
-    publishDir params.results_dir, mode: 'symlink', pattern '*.mzML'
+    publishDir params.results_dir, mode: 'symlink', pattern: '*.mzML'
 
     input:
     val row
@@ -53,7 +53,7 @@ process comet {
 }
 
 process percolator {
-    publishDir params.results_dir, mode: 'copy', pattern '*.p*'
+    publishDir params.results_dir, mode: 'copy', pattern: '*.p*'
 
     input:
     tuple val(row), path(mzml), path(pin)
@@ -94,7 +94,7 @@ process xcms {
 }
 
 process feature_mapper {
-    publishDir params.results_dir, mode: 'copy', pattern '*.intensities'
+    publishDir params.results_dir, mode: 'copy', pattern: '*.intensities'
 
     input:
     tuple val(row), path(mzml), path(pin), path(psms), path(peptides), path(features)
