@@ -88,7 +88,7 @@ process xcms {
         --output ${mzml}.features \\
         --xcms_params $launchDir/$row.xcms_params \\
         --peakmerge_params $launchDir/$row.merge_params \\
-        --algorithm xcms_cw
+        --algorithm xcms_cwip
         
     """
 }
