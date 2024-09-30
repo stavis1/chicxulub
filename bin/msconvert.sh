@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 launchDir=$1
 msconvert=$2
 spectra=$3

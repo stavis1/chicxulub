@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 work_dir=$1
 cd $work_dir

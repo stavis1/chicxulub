@@ -15,7 +15,7 @@ process setup_exes {
     script:
     env_name = 'search_env'
     """
-    bash $projectDir/setup.sh $projectDir
+    setup.sh $projectDir
     """
 }
 
@@ -31,7 +31,7 @@ process msconvert {
 
     script:
     """
-    $projectDir/msconvert.sh $launchDir $msconvert $row.spectra
+    msconvert.sh $launchDir $msconvert $row.spectra
     """
 }
 
