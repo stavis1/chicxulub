@@ -168,6 +168,7 @@ env/*
 exes/*
 !exes/*.def
 !exes/*.dockerfile
+!exes/*.py
 test/*
 !test/Dockerfile
 !test/slurm.conf
