@@ -106,12 +106,14 @@ process feature_mapper {
     script:
     basename_peptides = peptides.getName()
     """
+    singularity run --bind ./:/data/ $feature_mapper python /mapper/options_parser.py \\
+        --params $launchDir/$row.params
     singularity run --bind ./:/data/ $feature_mapper python /mapper/feature_mapper.py \\
         --features $features \\
         --peptide $peptides \\
         --psms $psms \\
         --mzml $mzml \\
-        --varaible_c_alk $params.cys_alk \\
+        --params /data/feature_mapper_params \\
         --output ${basename_peptides}.intensities
     """
 }

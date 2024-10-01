@@ -16,8 +16,8 @@ parser.add_argument('--psms', action = 'store', required = True,
                     help = 'The psms output of Percolator.')
 parser.add_argument('--mzml', action = 'store', required = True,
                     help = 'The mzML file associated with the PSM table.')
-parser.add_argument('--varaible_c_alk', action = 'store', default = 'const', choices = ['const', 'variable'],
-                    help = 'Is carbamidomethylation of cysteine a variable modification?')
+parser.add_argument('--params', action = 'store', required = True,
+                    help = 'A toml file of parameters')
 parser.add_argument('--output', action = 'store', required = True,
                     help = 'The name of the results file.')
 args = parser.parse_args()
@@ -26,15 +26,15 @@ from collections import defaultdict
 from multiprocessing import Pool
 import re
 from functools import cache
+import tomllib
 
 import pymzml
 from sortedcontainers import SortedList
 import numpy as np
 import pandas as pd
 
-params = {'ppm':5,
-          'rt_wiggle':0,
-          'cores':4}
+with open(args.params, 'rb') as params_file:
+    params = tomllib.load(params_file)
 
 H = 1.007276
 H2O = 18.010565 
@@ -44,7 +44,7 @@ aa_masses = {'G':57.021463735,
              'P':97.052763875,
              'V':99.068413945,
              'T':101.047678505,
-             'C':103.009184505 if args.varaible_c_alk == 'varaible' else 160.030648505,
+             'C':103.009184505 if params.varaible_c_alk == 'varaible' else 160.030648505,
              'L':113.084064015,
              'I':113.084064015,
              'N':114.04292747,
