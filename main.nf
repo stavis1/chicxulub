@@ -10,14 +10,9 @@ process params_parser {
     val row
 
     output:
-    tuple val(row), val(options)
+    tuple val(row), path('*.params')
 
     script:
-    options = ['comet':task.workDir.resolve("comet.params").text, 
-            'percolator':task.workDir.resolve("percolator_params").text, 
-            'xcms':task.workDir.resolve("xcms_params").text, 
-            'merge':task.workDir.resolve("merge_params").text, 
-            'feature_mapper':task.workDir.resolve("feature_mapper_params").text]
     """
     python /parser/options_parser.py --params /data/${row.options}
     """
@@ -55,7 +50,7 @@ process comet {
     script:
     pin = mzml.getName()
     """
-    /comet/comet.linux.exe -P${options.comet} -D$launchDir/$row.sequences -N$pin $mzml
+    /comet/comet.linux.exe -Pcomet.params -D$launchDir/$row.sequences -N$pin $mzml
     grep -vE '[[:space:]]-?nan[[:space:]]' ${pin}.pin > tmp
     mv tmp ${pin}.pin
     """
@@ -75,7 +70,7 @@ process percolator {
     basename = pin.getName()
     """
     percolator \\
-        --parameter-file ${options.percolator} \\
+        --parameter-file percolator.params \\
         -m ${basename}.psms \\
         -r ${basename}.peptides \\
         $basename
@@ -96,8 +91,8 @@ process xcms {
     Rscript /xcms/xcms_quantify_features.R \\
         --mzml $mzml \\
         --output ${mzml}.features \\
-        --xcms_params ${options.xcms} \\
-        --peakmerge_params ${options.merge} \\
+        --xcms_params xcms.params \\
+        --peakmerge_params merge.params \\
         --algorithm xcms_cwip
         
     """
@@ -121,7 +116,7 @@ process feature_mapper {
         --peptide $peptides \\
         --psms $psms \\
         --mzml $mzml \\
-        --params ${options.feature_mapper} \\
+        --params feature_mapper.params \\
         --output ${basename_peptides}.intensities
     """
 }

@@ -8,7 +8,7 @@ Each tool requires a different formatting for its perameters so pattern match wh
 -K ';'   #this specifies the protein name separator
 --weights saved_weights
 
-##xcms_params
+##xcms.params
 ppm = [ 25,]
 peakwidth = [ 30, 50,]
 snthresh = [ 10,]
@@ -24,12 +24,12 @@ maxCharge = [ 3,]
 maxIso = [ 3,]
 mzIntervalExtension = [ true,]
 
-##merge_params
+##merge.params
 expandRt = [ 0,]
 expandMz = [ 0.0,]
 minProp = [ 0.6,]
 
-##feature_mapper_params
+##feature_mapper.params
 ppm = 5
 rt_wiggle = 0
 cores = 4
