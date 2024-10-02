@@ -1,5 +1,4 @@
 params.design = "$launchDir/design.tsv"
-params.cys_alk = 'const'
 params.results_dir = launchDir
 design = Channel.of(file(params.design)).splitCsv(header : true, sep : '\t', strip : true)
 
@@ -20,6 +19,7 @@ process setup_exes {
 }
 
 process msconvert {
+//    container 'stavisvols/msconvert:latest'
     publishDir params.results_dir, mode: 'symlink', pattern: '*.mzML'
 
     input:
@@ -53,6 +53,7 @@ process comet {
 }
 
 process percolator {
+    container 'stavisvols/percolator_for_pipeline:latest'
     publishDir params.results_dir, mode: 'copy', pattern: '*.p*'
 
     input:
@@ -65,7 +66,7 @@ process percolator {
     script:
     basename = pin.getName()
     """
-    singularity run --bind ./:/data/ $percolator percolator \\
+    percolator \\
         -K ';' \\
         -m /data/${basename}.psms \\
         -r /data/${basename}.peptides \\
@@ -74,6 +75,8 @@ process percolator {
 }
 
 process xcms {
+    container 'stavisvols/xcms_quantify_features:latest'
+
     input:
     tuple val(row), path(mzml), path(pin), path(psms), path(peptides)
     val xcms
@@ -83,7 +86,7 @@ process xcms {
 
     script:
     """
-    singularity run --bind ./:/data/ $xcms Rscript /xcms/xcms_quantify_features.R \\
+    Rscript /xcms/xcms_quantify_features.R \\
         --mzml $mzml \\
         --output ${mzml}.features \\
         --xcms_params $launchDir/$row.xcms_params \\
@@ -94,6 +97,7 @@ process xcms {
 }
 
 process feature_mapper {
+    container 'stavisvols/feature_mapper:latest'
     publishDir params.results_dir, mode: 'copy', pattern: '*.intensities'
 
     input:
@@ -106,14 +110,14 @@ process feature_mapper {
     script:
     basename_peptides = peptides.getName()
     """
-    singularity run --bind ./:/data/ $feature_mapper python /mapper/options_parser.py \\
+    python /mapper/options_parser.py \\
         --params $launchDir/$row.params
-    singularity run --bind ./:/data/ $feature_mapper python /mapper/feature_mapper.py \\
+    python /mapper/feature_mapper.py \\
         --features $features \\
         --peptide $peptides \\
         --psms $psms \\
         --mzml $mzml \\
-        --params /data/feature_mapper_params \\
+        --params feature_mapper_params \\
         --output ${basename_peptides}.intensities
     """
 }
