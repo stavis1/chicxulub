@@ -13,11 +13,11 @@ process params_parser {
     tuple val(row), val(options)
 
     script:
-    options = ['comet':file('comet.params'), 
-        'percolator':file('percolator_params'), 
-        'xcms':file('xcms_params'), 
-        'merge':file('merge_params'), 
-        'feature_mapper':file('feature_mapper_params')]
+    options = ['comet':file("$workDir/comet.params"), 
+            'percolator':file("$workDir/percolator_params"), 
+            'xcms':file("$workDir/xcms_params"), 
+            'merge':file("$workDir/merge_params"), 
+            'feature_mapper':file("$workDir/feature_mapper_params")]
     """
     python /parser/options_parser.py --params /data/${row.options}
     """
