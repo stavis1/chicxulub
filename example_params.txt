@@ -1,3 +1,13 @@
+This file is a concatenation of multiple parameters files used by several tools in the pipeline.
+Each tool requires a different formatting for its perameters so pattern match when modifying settings.
+
+##percolator_params
+#Any of the percolator command line parameters can be placed in this section.
+#To initialize percolator with a weights file uncomment the next line and specify the file by absolute path.
+#--init-weights /absolute/path/to/saved/weights/file
+-K ';'   #this specifies the protein name separator
+--weights saved_weights
+
 ##xcms_params
 ppm = [ 25,]
 peakwidth = [ 30, 50,]
@@ -20,13 +30,18 @@ expandMz = [ 0.0,]
 minProp = [ 0.6,]
 
 ##feature_mapper_params
+ppm = 5
+rt_wiggle = 0
+cores = 4
+variable_c_alk = true
 
 ##comet.params
 # comet_version 2024.01 rev. 1 (b236210)
 # Comet MS/MS search engine parameters file.
 # Everything following the '#' symbol is treated as a comment.
-#
-database_name = /some/path/db.fasta
+
+# it is not necessary for you to change the database here, this is handled by the pipeline
+database_name = /some/path/db.fasta 
 decoy_search = 2                       # 0=no (default), 1=internal decoy concatenated, 2=internal decoy separate
 
 num_threads = 4                        # 0=poll CPU to set num threads; else specify num threads directly (max 128)
