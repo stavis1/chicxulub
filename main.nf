@@ -40,6 +40,7 @@ process msconvert {
 
 process comet {
     container 'stavisvols/comet_for_pipeline:latest'
+    containerOptions "--bind $launchDir:/data/"
 
     input:
     tuple val(row), path(options), path(mzml)
@@ -50,7 +51,7 @@ process comet {
     script:
     pin = mzml.getName()
     """
-    /comet/comet.linux.exe -Pcomet.params -D$launchDir/$row.sequences -N$pin $mzml
+    /comet/comet.linux.exe -Pcomet.params -D/data/$row.sequences -N$pin $mzml
     grep -vE '[[:space:]]-?nan[[:space:]]' ${pin}.pin > tmp
     mv tmp ${pin}.pin
     """
