@@ -10,14 +10,13 @@ process params_parser {
     val row
 
     output:
-    tuple val(row), val(options)
-
-    script:
-    options = ['comet':path('comet.params'), 
+    tuple val(row), val(['comet':path('comet.params'), 
         'percolator':path('percolator_params'), 
         'xcms':path('xcms_params'), 
         'merge':path('merge_params'), 
-        'feature_mapper':path('feature_mapper_params')]
+        'feature_mapper':path('feature_mapper_params')])
+
+    script:
     """
     python /parser/options_parser.py --params /data/${row.options}
     """
@@ -130,12 +129,12 @@ workflow {
     params_parser(design)
 
     //identification
-    msconvert(params_parser)
-    comet(msconvert)
-    percolator(comet)
+    msconvert(params_parser.out)
+    comet(msconvert.out)
+    percolator(comet.out)
     
     //quantification
-    xcms(percolator)
-    feature_mapper(xcms)
+    xcms(percolator.out)
+    feature_mapper(xcms.out)
 }
 
