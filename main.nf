@@ -70,9 +70,9 @@ process percolator {
     """
     percolator \\
         -K ';' \\
-        -m /data/${basename}.psms \\
-        -r /data/${basename}.peptides \\
-        /data/$basename
+        -m ${basename}.psms \\
+        -r ${basename}.peptides \\
+        $basename
     """
 }
 
