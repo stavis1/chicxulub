@@ -10,16 +10,18 @@ process params_parser {
     val row
 
     output:
-    tuple val(row), val(['comet':path('comet.params'), 
-        'percolator':path('percolator_params'), 
-        'xcms':path('xcms_params'), 
-        'merge':path('merge_params'), 
-        'feature_mapper':path('feature_mapper_params')])
+    tuple val(row), val(options)
 
     script:
+    options = ['comet':file('comet.params'), 
+        'percolator':file('percolator_params'), 
+        'xcms':file('xcms_params'), 
+        'merge':file('merge_params'), 
+        'feature_mapper':file('feature_mapper_params')]
     """
     python /parser/options_parser.py --params /data/${row.options}
     """
+
 }
 
 process msconvert {
