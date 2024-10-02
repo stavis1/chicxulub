@@ -27,10 +27,10 @@ process msconvert {
     publishDir params.results_dir, mode: 'symlink', pattern: '*.mzML'
 
     input:
-    tuple val(row), val(options)
+    tuple val(row), path(options)
 
     output:
-    tuple val(row), val(options), path("${row.spectra}.mzML")
+    tuple val(row), path(options), path("${row.spectra}.mzML")
 
     script:
     """
@@ -42,10 +42,10 @@ process comet {
     container 'stavisvols/comet_for_pipeline:latest'
 
     input:
-    tuple val(row), val(options), path(mzml)
+    tuple val(row), path(options), path(mzml)
 
     output:
-    tuple val(row), val(options), path(mzml), path("${pin}.pin")
+    tuple val(row), path(options), path(mzml), path("${pin}.pin")
 
     script:
     pin = mzml.getName()
@@ -61,10 +61,10 @@ process percolator {
     publishDir params.results_dir, mode: 'copy', pattern: '*.p*'
 
     input:
-    tuple val(row), val(options), path(mzml), path(pin)
+    tuple val(row), path(options), path(mzml), path(pin)
 
     output:
-    tuple val(row), val(options), path(mzml), path(pin), path("${basename}.psms"), path("${basename}.peptides")
+    tuple val(row), path(options), path(mzml), path(pin), path("${basename}.psms"), path("${basename}.peptides")
     
     script:
     basename = pin.getName()
@@ -81,10 +81,10 @@ process xcms {
     container 'stavisvols/xcms_quantify_features:latest'
 
     input:
-    tuple val(row), val(options), path(mzml), path(pin), path(psms), path(peptides)
+    tuple val(row), path(options), path(mzml), path(pin), path(psms), path(peptides)
 
     output:
-    tuple val(row), val(options), path(mzml), path(pin), path(psms), path(peptides), path("${mzml}.features")
+    tuple val(row), path(options), path(mzml), path(pin), path(psms), path(peptides), path("${mzml}.features")
 
     script:
     """
@@ -103,10 +103,10 @@ process feature_mapper {
     publishDir params.results_dir, mode: 'copy', pattern: '*.intensities'
 
     input:
-    tuple val(row), val(options), path(mzml), path(pin), path(psms), path(peptides), path(features)
+    tuple val(row), path(options), path(mzml), path(pin), path(psms), path(peptides), path(features)
 
     output:
-    tuple val(row), val(options), path(mzml), path(pin), path(psms), path(peptides), path(features), path("${basename_peptides}.intensities")
+    tuple val(row), path(options), path(mzml), path(pin), path(psms), path(peptides), path(features), path("${basename_peptides}.intensities")
 
     script:
     basename_peptides = peptides.getName()
