@@ -17,7 +17,7 @@ process msconvert {
 
     script:
     """
-    bash /run_msconvert.sh "--outdir ./ --outfile ${row.spectra}.mzML ${row.spectra}"
+    bash /run_msconvert.sh "--outdir ./ --outfile ${row.spectra}.mzML $launchDir/${row.spectra}"
     """
 }
 
