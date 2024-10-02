@@ -2,36 +2,22 @@ params.design = "$launchDir/design.tsv"
 params.results_dir = launchDir
 design = Channel.of(file(params.design)).splitCsv(header : true, sep : '\t', strip : true)
 
-process setup_exes {
-    output:
-    val env_name, emit: env
-    val "$projectDir/exes/comet.linux.exe", emit: comet
-    val "$projectDir/exes/msconvert.sif", emit: msconvert
-    val "$projectDir/exes/percolator.sif", emit: percolator
-    val "$projectDir/exes/xcms.sif", emit: xcms
-    val "$projectDir/exes/feature_mapper.sif", emit: feature_mapper
-
-    script:
-    env_name = 'search_env'
-    """
-    setup.sh $projectDir
-    """
-}
-
 process msconvert {
-//    container 'stavisvols/msconvert:latest'
+    beforeScript 'mkdir wine_temp'
+    afterScript 'rm -rf wine_temp'
+    container 'stavisvols/msconvert:latest'
+    containerOptions '--bind wine_temp:/wineprefix64'
     publishDir params.results_dir, mode: 'symlink', pattern: '*.mzML'
 
     input:
     val row
-    val msconvert
 
     output:
     tuple val(row), path("${row.spectra}.mzML"), emit: mzml
 
     script:
     """
-    msconvert.sh $launchDir $msconvert $row.spectra
+    bash /run_msconvert.sh "--outdir ./ --outfile ${row.spectra}.mzML /data/${row.spectra}"
     """
 }
 
@@ -40,7 +26,6 @@ process comet {
 
     input:
     tuple val(row), path(mzml)
-    val comet
 
     output:
     tuple val(row), path(mzml), path("${pin}.pin"), emit: pin
@@ -60,7 +45,6 @@ process percolator {
 
     input:
     tuple val(row), path(mzml), path(pin)
-    val percolator
 
     output:
     tuple val(row), path(mzml), path(pin), path("${basename}.psms"), path("${basename}.peptides"), emit: pout
@@ -81,7 +65,6 @@ process xcms {
 
     input:
     tuple val(row), path(mzml), path(pin), path(psms), path(peptides)
-    val xcms
 
     output:
     tuple val(row), path(mzml), path(pin), path(psms), path(peptides), path("${mzml}.features"), emit: features
@@ -104,7 +87,6 @@ process feature_mapper {
 
     input:
     tuple val(row), path(mzml), path(pin), path(psms), path(peptides), path(features)
-    val feature_mapper
 
     output:
     tuple val(row), path(mzml), path(pin), path(psms), path(peptides), path(features), path("${basename_peptides}.intensities"), emit: intensities
@@ -125,16 +107,13 @@ process feature_mapper {
 }
 
 workflow {    
-    //download necessary tools and containers
-    setup_exes()
-    
     //identification
-    msconvert(design, setup_exes.out.msconvert)
-    comet(msconvert.out.mzml, setup_exes.out.comet)
-    percolator(comet.out.pin, setup_exes.out.percolator)
+    msconvert(design)
+    comet(msconvert.out.mzml)
+    percolator(comet.out.pin)
     
     //quantification
-    xcms(percolator.out.pout, setup_exes.out.xcms)
-    feature_mapper(xcms.out.features, setup_exes.out.feature_mapper)
+    xcms(percolator.out.pout)
+    feature_mapper(xcms.out.features)
 }
 
