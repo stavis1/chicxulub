@@ -6,7 +6,7 @@ process msconvert {
     beforeScript 'mkdir wine_temp'
     afterScript 'rm -rf wine_temp'
     container 'stavisvols/msconvert:latest'
-    containerOptions '--bind wine_temp:/wineprefix64'
+    containerOptions "--bind wine_temp:/wineprefix64 --bind $launchDir:/data/"
     publishDir params.results_dir, mode: 'symlink', pattern: '*.mzML'
 
     input:
@@ -17,7 +17,7 @@ process msconvert {
 
     script:
     """
-    bash /run_msconvert.sh "--outdir ./ --outfile ${row.spectra}.mzML $launchDir/${row.spectra}"
+    bash /run_msconvert.sh "--outdir ./ --outfile ${row.spectra}.mzML /data/${row.spectra}"
     """
 }
 
