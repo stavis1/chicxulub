@@ -16,7 +16,6 @@ process params_parser {
     """
     python /parser/options_parser.py --params /data/${row.options}
     """
-
 }
 
 process msconvert {
@@ -59,7 +58,7 @@ process comet {
 
 process percolator {
     container 'stavisvols/percolator_for_pipeline:latest'
-    publishDir params.results_dir, mode: 'copy', pattern: '*.p*'
+    publishDir params.results_dir, mode: 'copy', pattern: '*.{psms,peptides}*'
 
     input:
     tuple val(row), path(options), path(mzml), path(pin)
