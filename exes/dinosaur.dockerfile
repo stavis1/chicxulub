@@ -1,4 +1,4 @@
-FROM eclipse-temurin/8u422-b05-jre-noble
+FROM eclipse-temurin:8u422-b05-jre-noble
 
 RUN apt-get update -y && \
     apt-get install -y wget && \
