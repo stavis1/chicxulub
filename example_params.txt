@@ -33,7 +33,7 @@ minProp = [ 0.6,]
 ppm = 5
 rt_wiggle = 0
 cores = 4
-variable_c_alk = true
+variable_c_alk = false
 
 ##comet.params
 # comet_version 2024.01 rev. 1 (b236210)
