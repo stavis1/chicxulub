@@ -89,7 +89,7 @@ process dinosaur {
 
     script:
     """
-    java -Xmx16g -jar /dinosaur/Dinosaur.jar --advParams=dinosaur.params --concurrency=4 $mzml
+    java -Xmx16g -jar /dinosaur/Dinosaur.jar --advParams=dinosaur.params --concurrency=4 --outName=${mzml} $mzml
     """
 }
 
