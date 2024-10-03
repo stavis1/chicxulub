@@ -33,7 +33,7 @@ process msconvert {
 
     script:
     """
-    bash /run_msconvert.sh "--outdir ./ --outfile ${row.spectra}.mzML /data/${row.spectra}"
+    bash /run_msconvert.sh "--config msconvert.params --outfile ${row.spectra}.mzML /data/${row.spectra}"
     """
 }
 
