@@ -191,20 +191,11 @@ scan_rt = {s.ID:s.scan_time_in_minutes() for s in run}
 
 #read and process feauture table
 features = pd.read_csv(args.features, sep = '\t').replace(0, np.nan)
-features.columns = ['mz',
-                    'mzmin',
-                    'mzmax',
-                    'rt',
-                    'rt_start',
-                    'rt_end',
-                    'intensity',
-                    'intb',
-                    'maxo',
-                    'sn',
-                    'sample']
+features['rt_start'] = features['rtStart']
+features['rt_end'] = features['rtEnd']
+features['mz'] = (features['mass']/features['charge']) + H
+features['intensity'] = features['intensitySum']/features['charge']
 features = features[['rt_start', 'rt_end', 'mz', 'intensity']]
-features['rt_start'] = features['rt_start']/60
-features['rt_end'] = features['rt_end']/60
 
 #read identification tables
 psms = pd.read_csv(args.psms, sep = '\t')

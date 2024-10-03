@@ -8,26 +8,20 @@ Each tool requires a different formatting for its perameters so pattern match wh
 -K ';'   #this specifies the protein name separator
 --weights saved_weights
 
-##xcms.params
-ppm = [ 25,]
-peakwidth = [ 30, 50,]
-snthresh = [ 10,]
-prefilter = [ 2, 1000,]
-mzCenterFun = [ "wMean",]
-integrate = [ 2,]
-mzdiff = [ -0.001,]
-fitgauss = [ false,]
-noise = [ 0,]
-firstBaselineCheck = [ true,]
-snthreshIsoROIs = [ 6.25,]
-maxCharge = [ 3,]
-maxIso = [ 3,]
-mzIntervalExtension = [ true,]
-
-##merge.params
-expandRt = [ 0,]
-expandMz = [ 0.0,]
-minProp = [ 0.6,]
+##dinosaur.params
+averagineCorr=0.6
+averagineExplained=0.5
+chargePairPPM=2.0
+deisoCorr=0.6
+hillMaxMissing=1
+hillMinLength=3
+hillPPM=8.0
+hillPeakFactor=1
+hillPeakFactorMinLength=40
+hillSmoothMeanWindow=1
+hillSmoothMedianWindow=1
+hillValleyFactor=1.3
+noHillSplit=True
 
 ##feature_mapper.params
 ppm = 5

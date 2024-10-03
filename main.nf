@@ -78,24 +78,18 @@ process percolator {
     """
 }
 
-process xcms {
-    container 'stavisvols/xcms_quantify_features:latest'
+process dinosaur {
+    container 'stavisvols/dinosaur_for_pipeline:latest'
 
     input:
     tuple val(row), path(options), path(mzml), path(pin), path(psms), path(peptides)
 
     output:
-    tuple val(row), path(options), path(mzml), path(pin), path(psms), path(peptides), path("${mzml}.features")
+    tuple val(row), path(options), path(mzml), path(pin), path(psms), path(peptides), path("${mzml}.features.tsv")
 
     script:
     """
-    Rscript /xcms/xcms_quantify_features.R \\
-        --mzml $mzml \\
-        --output ${mzml}.features \\
-        --xcms_params xcms.params \\
-        --peakmerge_params merge.params \\
-        --algorithm xcms_cwip
-        
+    java -Xmx16g -jar /dinosaur/Dinosaur.jar --advParams=dinosaur.params --concurrency=4 $mzml
     """
 }
 
@@ -132,7 +126,7 @@ workflow {
     percolator(comet.out)
     
     //quantification
-    xcms(percolator.out)
-    feature_mapper(xcms.out)
+    dinosaur(percolator.out)
+    feature_mapper(dinosaur.out)
 }
 
