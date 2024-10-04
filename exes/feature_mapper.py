@@ -199,7 +199,9 @@ features = features[['rt_start', 'rt_end', 'mz', 'intensity']]
 
 #read identification tables
 psms = pd.read_csv(args.psms, sep = '\t')
+psms = psms[psms['q-value'] < params['FDR']]
 peptides = pd.read_csv(args.peptides, sep = '\t')
+peptides = peptides[peptides['q-value'] < params['FDR']]
 
 #filter psms to ones that map to extant peptides
 observed_peptides = set(peptides['peptide'])

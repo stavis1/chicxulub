@@ -31,6 +31,7 @@ ppm = 5
 rt_wiggle = 0
 cores = 4
 variable_c_alk = false
+FDR = 0.01
 
 ##comet.params
 # comet_version 2024.01 rev. 1 (b236210)
