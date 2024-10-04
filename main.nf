@@ -33,7 +33,8 @@ process msconvert {
 
     script:
     """
-    bash /run_msconvert.sh "--config msconvert.params --outfile ${row.spectra}.mzML /data/${row.spectra}"
+    cp -r /temporary_wine_dir/* /wineprefix64
+    wine msconvert --config msconvert.params --outfile ${row.spectra}.mzML /data/${row.spectra}
     """
 }
 
