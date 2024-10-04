@@ -169,6 +169,8 @@ exes/*
 !exes/*.def
 !exes/*.dockerfile
 !exes/*.py
+!exes/*.sh
+!exes/*.txt
 test/*
 !test/Dockerfile
 !test/slurm.conf
