@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Sep 26 13:28:24 2024
+Created on Mon Oct  7 10:05:12 2024
 
 @author: 4vt
 """
@@ -25,7 +25,6 @@ args = parser.parse_args()
 from collections import defaultdict
 from multiprocessing import Pool
 import re
-from functools import cache
 import tomllib
 
 import pymzml
@@ -61,157 +60,124 @@ aa_masses = {'G':57.021463735,
              'W':186.07931298,
              'O':237.147726925}
 
-class keydefaultdict(defaultdict):
-    '''
-    subclass of defaultdict that passes the key to the first argument of the default function
-    '''
-    def __missing__(self, key):
-        if self.default_factory is None:
-            raise KeyError( key )
-        else:
-            ret = self[key] = self.default_factory(key)
-            return ret
-
-def map_feature(psm_idx):
-    '''
-    arguments:
-        psm_index (an integer) refers to the index in the psms table
-    returns:
-        feature_set (a set) of indices from the feature table that map to the PSM
-    '''
-    feature_set = set([])
-    for charge in range(1,6):
-        rt = psm_rt[psm_idx]
-        mz = psm_mass[psm_idx]/charge + H
-        ppm = (mz/1e6)*float(params['ppm'])
-        rtstart_set = set((i[1] for i in rtstart_idx.irange((rt-max_rt_width,), (rt,))))
-        rtend_set = set((i[1] for i in rtend_idx.irange((rt,), (rt+max_rt_width,))))
-        rt_set = rtstart_set.intersection(rtend_set)
-        mz_set = set((i[1] for i in mz_idx.irange((mz-ppm,),(mz+ppm,))))
-        feature_set.update(rt_set.intersection(mz_set))
-    return feature_set
-
-def peptide_rollup(features, psms):
-    '''
-    arguments:
-        features (a dataframe) must have columns: rt_start, rt_end, mz, intensity
-        psms (a dataframe) must have columns: mass, rt, sequence, proteinIds
-    returns:
-        a dataframe with columns: sequence, intensity, proteins
-    note that retention time should be in minutes
-    '''
+class Feature:
+    def __init__(self, start, end, mz, intensity):
+        self.psms = []
+        self.start = start
+        self.end = end
+        self.mz = mz
+        self.intensity = intensity
+        self.hash = hash((start, end, mz, intensity))
     
-    #set up indexes as globals to use in parallelized map_feature() calls
-    global psm_rt
-    psm_rt = {i:rt for i,rt in zip(psms.index, psms['rt'])}
-    global psm_mass
-    psm_mass = {i:mass for i,mass in zip(psms.index, psms['mass'])}
-    global rtstart_idx
-    rtstart_idx = SortedList(zip(features['rt_start'] - float(params['rt_wiggle']), features.index))
-    global rtend_idx
-    rtend_idx = SortedList(zip(features['rt_end'] + float(params['rt_wiggle']), features.index))
-    global max_rt_width
-    max_rt_width = max(features['rt_end'] - features['rt_start'])
-    global mz_idx
-    mz_idx = SortedList(zip(features['mz'], features.index))
-    intensity_map = {idx:intensity for idx, intensity in zip(features.index, features['intensity'])}
+    def __hash__(self):
+        return self.hash
     
-    #connect features to PSMs
-    with Pool(params['cores']) as p:
-        feature_map = p.map(map_feature, psms.index)
+    def is_degenerate(self):
+        return len(set(psm.seq for psm in self.psms)) > 1
+
+class Psm:
+    def __init__(self, name, seq, pep):
+        self.pep = pep
+        self.name = name
+        self.scan = int(re.search(r'(\d+)_\d+_\d+\Z', name).group(1))        
+        self.seq = re.search(r'\.((?:[A-Z](?:\[[^\]]+\])?)+)\.', seq).group(1)
+        self.charge = int(re.search(r'(\d+)_\d+\Z', name).group(1))
+        self.mass = self.calc_peptide_mass()
+        self.mz = (self.mass/self.charge) + H
+        self.rt = scan_rt[self.scan]
+        self.features = []
     
-    #set up sequence to proteins mapping
-    seq_prots = {s:p for s,p in zip(psms['sequence'], psms['proteinIds'])}
+    def calc_peptide_mass(self):
+        mass = np.sum([aa_masses[aa] for aa in re.findall(r'[A-Z]', self.seq)])
+        mass += np.sum([float(mod) for mod in re.findall(r'\d+(?:\.\d+)?', self.seq)])
+        mass += H2O
+        return mass
 
-    class peptide():
-        def __init__(self, seq):
-            self.seq = seq
-            self.prots = seq_prots[seq]
-            self.psm_indices = []
-            self.features = set([])
-        
-        def add_psm(self, psm_index, features):
-            self.psm_indices.append(psm_index)
-            self.features.update(features)
-        
-        def remove_bad_features(self, bad_features):
-            self.features = [f for f in self.features if f not in bad_features]
-            
-        def calculate_intensity(self, intensity_map):
-            self.intensity = np.sum([intensity_map[f] for f in self.features])
-        
-        def report(self):
-            return (self.seq, 
-                    self.intensity,
-                    self.prots)
-        
-    #initialize peptide objects
-    peptides = keydefaultdict(peptide)
-    for seq, psm, feature_set in zip(psms['sequence'], psms.index, feature_map):
-        if feature_set:
-            peptides[seq].add_psm(psm, feature_set)
-
-    #remove degenerate features
-    feature_peptides = defaultdict(lambda:[])
-    for peptide in peptides.values():
-        for feature in peptide.features:
-            feature_peptides[feature].append(peptide.seq)
-    bad_features = set(f for f,p in feature_peptides.items() if len(p) > 1)
-
-    for peptide in peptides.values():
-        peptide.remove_bad_features(bad_features)
-    peptide_list = [pep for pep in peptides.values() if pep.features]
-
-    #calculate intensity
-    for peptide in peptide_list:
-        peptide.calculate_intensity(intensity_map)
+class Peptide():
+    def __init__(self, seq, prots):
+        self.seq = re.search(r'\.((?:[A-Z](?:\[[^\]]+\])?)+)\.', seq).group(1)
+        self.prots = prots
+        self.psms = []
+        self.features = set()
     
-    #make results dataframe
-    peptide_data = pd.DataFrame([p.report() for p in peptide_list],
-                                columns = ('sequence', 'intensity', 'proteins'))
-    return peptide_data
+    def add_psm(self, psm):
+        self.psms.append(psm)
+        self.features.update(feature_map[hash(f)] for f in psm.features)
+    
+    def remove_bad_features(self):
+        self.features = set(f for f in self.features if not f.is_degenerate())
+        
+    def calculate_intensity(self):
+        self.intensity = np.sum([f.intensity for f in self.features])
+    
+    def report(self):
+        self.remove_bad_features()
+        self.calculate_intensity()
+        return (self.seq, 
+                self.intensity,
+                self.prots)
 
-@cache
-def calc_peptide_mass(sequence):
-    '''
-    arguments:
-        sequence (a string) the entry in the 'peptide' column of the PSM table
-    returns
-        a float that is the monoisotopic mass of that peptidoform
-    '''
-    base_sequence = re.search(r'\A[^\.]+\.((?:[A-Z](?:\[[^\]]+\])?)+)\.[^\.]+\Z', sequence).group(1)
-    mass = np.sum([aa_masses[aa] for aa in re.findall(r'[A-Z]', base_sequence)])
-    mass += np.sum([float(mod) for mod in re.findall(r'\d+(?:\.\d+)?', base_sequence)])
-    mass += H2O
-    return mass
+def attach_features(psm):
+    started_before = set(f[1] for f in rt_starts.irange((psm.rt - max_Δrt, ), (psm.rt,)))
+    ended_after = set(f[1] for f in rt_ends.irange((psm.rt, ), (psm.rt + max_Δrt,)))
+    Δmz = (psm.mz/1e6)*params['ppm']
+    mz_matched = set(f[1] for f in mzs.irange((psm.mz - Δmz,), (psm.mz + Δmz,)))
+    features = started_before.intersection(ended_after).intersection(mz_matched)
+    psm.features = features
+    return psm
 
 #map scan numbers to retention times
 run = pymzml.run.Reader(args.mzml)
 scan_rt = {s.ID:s.scan_time_in_minutes() for s in run}
 
 #read and process feauture table
-features = pd.read_csv(args.features, sep = '\t').replace(0, np.nan)
-features['rt_start'] = features['rtStart']
-features['rt_end'] = features['rtEnd']
-features['mz'] = (features['mass']/features['charge']) + H
-features['intensity'] = features['intensitySum']/features['charge']
-features = features[['rt_start', 'rt_end', 'mz', 'intensity']]
+feature_table = pd.read_csv(args.features, sep = '\t').replace(0, np.nan)
+fcols = ['rtStart', 'rtEnd', 'mz', 'intensityApex']
+features = [Feature(start, end, mz, intensity) for start, end, mz, intensity in zip(*[feature_table[c] for c in fcols])]
 
-#read identification tables
-psms = pd.read_csv(args.psms, sep = '\t')
-psms = psms[psms['q-value'] < params['FDR']]
-peptides = pd.read_csv(args.peptides, sep = '\t')
-peptides = peptides[peptides['q-value'] < params['FDR']]
+#make psm objects
+psm_table = pd.read_csv(args.psms, sep = '\t')
+psm_table = psm_table[psm_table['q-value'] < params['FDR']]
+psms = [Psm(name, seq, pep) for name, seq, pep in zip(psm_table['PSMId'], psm_table['peptide'], psm_table['posterior_error_prob'])]
+
+#keep only best scoring PSM per scan
+scans = defaultdict(lambda: [])
+for psm in psms:
+    scans[psm.scan].append(psm)
+psms = [min(scan, key = lambda x: x.pep) for scan in scans.values()]
+
+#make peptide objects
+peptide_table = pd.read_csv(args.peptides, sep = '\t')
+peptide_table = peptide_table[peptide_table['q-value'] < params['FDR']]
+peptides = [Peptide(seq, prots) for seq, prots in zip(peptide_table['peptide'], peptide_table['proteinIds'])]
 
 #filter psms to ones that map to extant peptides
-observed_peptides = set(peptides['peptide'])
-psms = psms[[pep in observed_peptides for pep in psms['peptide']]]
+observed_peptides = set([p.seq for p in peptides])
+psms = [psm for psm in psms if psm.seq in observed_peptides]
 
-#set up necessary columns in PSM table
-psms['sequence'] = psms['peptide']
-psms['mass'] = [calc_peptide_mass(seq) for seq in psms['sequence']]
-psms['scan'] = [int(re.search(r'(\d+)_\d+_\d+\Z', i).group(1)) for i in psms['PSMId']]
-psms['rt'] = [scan_rt[s] for s in psms['scan']]
+#set up data structures for fast lookup
+rt_starts = SortedList([(f.start, f) for f in features], key = lambda x: x[0])
+rt_ends = SortedList([(f.end, f) for f in features], key = lambda x: x[0])
+max_Δrt = max(f.end - f.start for f in features)
+mzs = SortedList([(f.mz, f) for f in features], key = lambda x: x[0])
+peptide_map = {p.seq:p for p in peptides}
+feature_map = {hash(f):f for f in features}
 
-intensities = peptide_rollup(features, psms)
-intensities.to_csv(args.output, sep = '\t', index = False)
+#map features to psms
+with Pool(params['cores']) as p:
+    psms = p.map(attach_features, psms)
+
+#map psms to features
+for psm in psms:
+    for feature in psm.features:
+        feature_map[hash(feature)].psms.append(psm)
+
+#map psms to peptides
+for psm in psms:
+    peptide_map[psm.seq].add_psm(psm)
+
+#report quantified peptides
+intensities = pd.DataFrame((pep.report() for pep in peptides),
+                           columns = ('sequence', 'intensity', 'proteins'))
+intensities = intensities[intensities['intensity'] > 0.0]
+intensities.to_csv(args.output)
