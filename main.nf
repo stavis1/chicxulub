@@ -10,7 +10,7 @@ process params_parser {
     val row
 
     output:
-    tuple val(row), path('*.params'), path("$launchDir/${row.spectra}.mzML")
+    tuple val(row), path('*.params'), path("$launchDir/$row.spectra")
 
     script:
     """
