@@ -14,7 +14,7 @@ process params_parser {
 
     script:
     """
-    ln $launchDir/$row.spectra ./
+    cp /data/$row.spectra ./
     python /parser/options_parser.py --params /data/${row.options}
     """
 }
