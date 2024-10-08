@@ -10,31 +10,11 @@ process params_parser {
     val row
 
     output:
-    tuple val(row), path('*.params')
+    tuple val(row), path('*.params'), path("$launchDir/${row.spectra}.mzML")
 
     script:
     """
     python /parser/options_parser.py --params /data/${row.options}
-    """
-}
-
-process msconvert {
-    beforeScript 'mkdir wine_temp'
-    afterScript 'rm -rf wine_temp'
-    container 'stavisvols/msconvert:latest'
-    containerOptions "--bind wine_temp:/wineprefix64 --bind $launchDir:/data/"
-    publishDir params.results_dir, mode: 'symlink', pattern: '*.mzML'
-
-    input:
-    tuple val(row), path(options)
-
-    output:
-    tuple val(row), path(options), path("${row.spectra}.mzML")
-
-    script:
-    """
-    cp -r /temporary_wine_dir/* /wineprefix64
-    wine msconvert --config msconvert.params --outfile ${row.spectra}.mzML /data/${row.spectra}
     """
 }
 
@@ -121,8 +101,7 @@ workflow {
     params_parser(design)
 
     //identification
-    msconvert(params_parser.out)
-    comet(msconvert.out)
+    comet(params_parser.out)
     percolator(comet.out)
     
     //quantification
