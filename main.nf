@@ -10,10 +10,11 @@ process params_parser {
     val row
 
     output:
-    tuple val(row), path('*.params'), path("$launchDir/$row.spectra")
+    tuple val(row), path('*.params'), path("$row.spectra")
 
     script:
     """
+    ln $launchDir/$row.spectra ./
     python /parser/options_parser.py --params /data/${row.options}
     """
 }
