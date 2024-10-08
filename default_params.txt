@@ -74,7 +74,7 @@ search_enzyme_number = 1               # choose from list at end of this params 
 search_enzyme2_number = 0              # second enzyme; set to 0 if no second enzyme
 sample_enzyme_number = 1               # specifies the sample enzyme which is possibly different than the one applied to the search;
                                        # used by PeptideProphet to calculate NTT & NMC in pepXML output (default=1 for trypsin).
-num_enzyme_termini = 2                 # 1 (semi-digested), 2 (fully digested, default), 8 C-term unspecific , 9 N-term unspecific
+num_enzyme_termini = 1                 # 1 (semi-digested), 2 (fully digested, default), 8 C-term unspecific , 9 N-term unspecific
 allowed_missed_cleavage = 2            # maximum value is 5; for enzyme search
 
 #
@@ -106,7 +106,7 @@ require_variable_mod = 0
 # ion trap ms/ms:  1.0005 tolerance, 0.4 offset (mono masses), theoretical_fragment_ions = 1
 # high res ms/ms:    0.02 tolerance, 0.0 offset (mono masses), theoretical_fragment_ions = 0, spectrum_batch_size = 15000
 #
-fragment_bin_tol = 0.02                # binning to use on fragment ions
+fragment_bin_tol = 0.01                # binning to use on fragment ions
 fragment_bin_offset = 0.0              # offset position to start the binning (0.0 to 1.0)
 theoretical_fragment_ions = 0          # 0=use flanking peaks, 1=M peak only
 use_A_ions = 0
