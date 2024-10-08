@@ -1,9 +1,6 @@
 docker build -t stavisvols/params_parser -f params_parser.dockerfile ./
 docker push stavisvols/params_parser
 
-docker build -t stavisvols/msconvert -f msconvert.dockerfile ./
-docker push stavisvols/msconvert
-
 docker build -t stavisvols/comet_for_pipeline -f comet.dockerfile ./
 docker push stavisvols/comet_for_pipeline
 
