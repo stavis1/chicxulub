@@ -22,7 +22,7 @@ parser.add_argument('--params', action = 'store', required = True,
                     help = 'A toml file of parameters')
 parser.add_argument('--output', action = 'store', required = True,
                     help = 'The name of the results file.')
-args = parser.parse_args('--features 20210827_ST_HeLa_NoFA_2ug_1D_RP180_QE3_s01.raw.mzML.features.tsv --peptides 20210827_ST_HeLa_NoFA_2ug_1D_RP180_QE3_s01.raw.mzML.pin.peptides --psms 20210827_ST_HeLa_NoFA_2ug_1D_RP180_QE3_s01.raw.mzML.pin.psms --mzml 20210827_ST_HeLa_NoFA_2ug_1D_RP180_QE3_s01.raw.mzML --faa human_contams.faa --params feature_mapper.params --output test3.out'.split())
+args = parser.parse_args()
 
 from collections import defaultdict
 from multiprocessing import Pool
