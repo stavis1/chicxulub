@@ -16,11 +16,13 @@ parser.add_argument('--psms', action = 'store', required = True,
                     help = 'The psms output of Percolator.')
 parser.add_argument('--mzml', action = 'store', required = True,
                     help = 'The mzML file associated with the PSM table.')
+parser.add_argument('--faa', action = 'store', required = True,
+                    help = 'The fasta file associated with the PSM table.')
 parser.add_argument('--params', action = 'store', required = True,
                     help = 'A toml file of parameters')
 parser.add_argument('--output', action = 'store', required = True,
                     help = 'The name of the results file.')
-args = parser.parse_args()
+args = parser.parse_args('--features 20210827_ST_HeLa_NoFA_2ug_1D_RP180_QE3_s01.raw.mzML.features.tsv --peptides 20210827_ST_HeLa_NoFA_2ug_1D_RP180_QE3_s01.raw.mzML.pin.peptides --psms 20210827_ST_HeLa_NoFA_2ug_1D_RP180_QE3_s01.raw.mzML.pin.psms --mzml 20210827_ST_HeLa_NoFA_2ug_1D_RP180_QE3_s01.raw.mzML --faa human_contams.faa --params feature_mapper.params --output test3.out'.split())
 
 from collections import defaultdict
 from multiprocessing import Pool
@@ -97,6 +99,7 @@ class Peptide():
     def __init__(self, seq, prots):
         self.seq = re.search(r'\.((?:[A-Z](?:\[[^\]]+\])?)+)\.', seq).group(1)
         self.prots = prots
+        self.lengths = ';'.join(str(protlens[p]) for p in prots.split(';'))
         self.psms = []
         self.features = set()
     
@@ -115,7 +118,8 @@ class Peptide():
         self.calculate_intensity()
         return (self.seq, 
                 self.intensity,
-                self.prots)
+                self.prots,
+                self.lengths)
 
 def attach_features(psm):
     started_before = set(f[1] for f in rt_starts.irange((psm.rt - max_Δrt, ), (psm.rt,)))
@@ -129,6 +133,10 @@ def attach_features(psm):
 #map scan numbers to retention times
 run = pymzml.run.Reader(args.mzml)
 scan_rt = {s.ID:s.scan_time_in_minutes() for s in run}
+
+#map protein lengths to protein names
+with open(args.faa) as faa:
+    protlens = {e.split()[0]:len(''.join(e.split('\n')[1:])) for e in faa.read().split('>')[1:]}
 
 #read and process feauture table
 feature_table = pd.read_csv(args.features, sep = '\t').replace(0, np.nan)
@@ -178,6 +186,6 @@ for psm in psms:
 
 #report quantified peptides
 intensities = pd.DataFrame((pep.report() for pep in peptides),
-                           columns = ('sequence', 'intensity', 'proteins'))
+                           columns = ('sequence', 'intensity', 'proteins', 'protein_lengths'))
 intensities = intensities[intensities['intensity'] > 0.0]
-intensities.to_csv(args.output)
+intensities.to_csv(args.output, sep = '\t', index = False)
