@@ -14,8 +14,8 @@ process params_parser {
 
     script:
     """
-    ln -s /data/$row.spectra ./
-    ln -s /data/$row.sequences ./
+    cp /data/$row.spectra ./
+    cp /data/$row.sequences ./
     python /parser/options_parser.py --params /data/${row.options}
     """
 }
