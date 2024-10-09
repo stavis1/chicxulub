@@ -10,7 +10,7 @@ process params_parser {
     val row
 
     output:
-    tuple val(row), path('*.params'), path("$row.spectra")
+    tuple val(row), path('*.params'), path("$row.spectra"), path("$row.sequences")
 
     script:
     """
@@ -21,18 +21,17 @@ process params_parser {
 
 process comet {
     container 'stavisvols/comet_for_pipeline:latest'
-    containerOptions "--bind $launchDir:/data/"
 
     input:
-    tuple val(row), path(options), path(mzml)
+    tuple val(row), path(options), path(mzml), path(faa)
 
     output:
-    tuple val(row), path(options), path(mzml), path("${pin}.pin")
+    tuple val(row), path(options), path(mzml), path(faa), path("${pin}.pin")
 
     script:
     pin = mzml.getName()
     """
-    /comet/comet.linux.exe -Pcomet.params -D/data/$row.sequences -N$pin $mzml
+    /comet/comet.linux.exe -Pcomet.params -D$faa -N$pin $mzml
     grep -vE '[[:space:]]-?nan[[:space:]]' ${pin}.pin > tmp
     mv tmp ${pin}.pin
     """
@@ -43,10 +42,10 @@ process percolator {
     publishDir params.results_dir, mode: 'copy', pattern: '*.{psms,peptides}*'
 
     input:
-    tuple val(row), path(options), path(mzml), path(pin)
+    tuple val(row), path(options), path(mzml), path(faa), path(pin)
 
     output:
-    tuple val(row), path(options), path(mzml), path(pin), path("${basename}.psms"), path("${basename}.peptides")
+    tuple val(row), path(options), path(mzml), path(faa), path(pin), path("${basename}.psms"), path("${basename}.peptides")
     
     script:
     basename = pin.getName()
@@ -63,10 +62,10 @@ process dinosaur {
     container 'stavisvols/dinosaur_for_pipeline:latest'
 
     input:
-    tuple val(row), path(options), path(mzml), path(pin), path(psms), path(peptides)
+    tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides)
 
     output:
-    tuple val(row), path(options), path(mzml), path(pin), path(psms), path(peptides), path("${mzml}.features.tsv")
+    tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path("${mzml}.features.tsv")
 
     script:
     """
@@ -79,10 +78,10 @@ process feature_mapper {
     publishDir params.results_dir, mode: 'copy', pattern: '*.intensities'
 
     input:
-    tuple val(row), path(options), path(mzml), path(pin), path(psms), path(peptides), path(features)
+    tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features)
 
     output:
-    tuple val(row), path(options), path(mzml), path(pin), path(psms), path(peptides), path(features), path("${basename_peptides}.intensities")
+    tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features), path("${basename_peptides}.intensities")
 
     script:
     basename_peptides = peptides.getName()
