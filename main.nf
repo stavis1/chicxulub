@@ -10,7 +10,7 @@ process params_parser {
     val row
 
     output:
-    tuple val(row), path('*.params'), path("$row.spectra"), path("$row.sequences")
+    tuple val(row), path('*_params'), path("$row.spectra"), path("$row.sequences")
 
     script:
     """
@@ -32,7 +32,7 @@ process comet {
     script:
     pin = mzml.getName()
     """
-    /comet/comet.linux.exe -Pcomet.params -D$faa -N$pin $mzml
+    /comet/comet.linux.exe -Pcomet_params -D$faa -N$pin $mzml
     grep -vE '[[:space:]]-?nan[[:space:]]' ${pin}.pin > tmp
     mv tmp ${pin}.pin
     """
@@ -52,7 +52,7 @@ process percolator {
     basename = pin.getName()
     """
     percolator \\
-        --parameter-file percolator.params \\
+        --parameter-file percolator_params \\
         -m ${basename}.psms \\
         -r ${basename}.peptides \\
         $basename
@@ -70,7 +70,7 @@ process dinosaur {
 
     script:
     """
-    java -Xmx16g -jar /dinosaur/Dinosaur.jar --advParams=dinosaur.params --concurrency=4 --outName=${mzml} $mzml
+    java -Xmx16g -jar /dinosaur/Dinosaur.jar --advParams=dinosaur_params --concurrency=4 --outName=${mzml} $mzml
     """
 }
 
@@ -92,7 +92,7 @@ process feature_mapper {
         --peptide $peptides \\
         --psms $psms \\
         --mzml $mzml \\
-        --params feature_mapper.params \\
+        --params feature_mapper_params \\
         --output ${basename_peptides}.intensities
     """
 }
