@@ -12,3 +12,6 @@ docker push stavisvols/dinosaur_for_pipeline
 
 docker build -t stavisvols/feature_mapper -f feature_mapper.dockerfile ./
 docker push stavisvols/feature_mapper
+
+docker build -t stavisvols/eggnog_for_pipeline -f eggnog.dockerfile ./
+docker push stavisvols/eggnog_for_pipeline

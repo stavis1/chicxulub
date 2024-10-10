@@ -5,3 +5,6 @@ RUN apt-get update -y && \
     apt-get install -y gcc python3-dev 
 
 RUN pip install eggnog-mapper
+RUN pip install tomli
+
+COPY eggnog_wrapper.py /usr/local/bin/
