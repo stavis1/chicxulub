@@ -92,7 +92,6 @@ process feature_mapper {
         --peptide $peptides \\
         --psms $psms \\
         --mzml $mzml \\
-        --faa $row.sequences \\
         --params feature_mapper.params \\
         --output ${basename_peptides}.intensities
     """
