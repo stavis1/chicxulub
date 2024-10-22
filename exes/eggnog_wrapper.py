@@ -22,17 +22,17 @@ import subprocess
 with open(args.options, 'rb') as toml:
     options = tomli.load(toml)
 
-def make_optstring(opts):
-    optstring = ' '.join(f'--{k} {v}' if type(v) != bool else f'--{k}' for k,v in opts.items())
-    optstring += ' ' + args.run_args
-    return optstring
+def flag_string(k,v):
+    mark = '-' if len(k) == 1 else '--'
+    return f'{mark}{k} {v}' if type(v) != bool else f'{mark}{k}'
+
+optstring = ' '.join(flag_string(k,v) for k,v in options.items())
+optstring += ' ' + args.run_args
 
 if args.task == 'download':
-    optstring = make_optstring(options['download_eggnog_data_params'])
     subprocess.run(f'download_eggnog_data.py {optstring}', shell = True)
 
 if args.task == 'search':
-    optstring = make_optstring(options['emapper_params'])
     subprocess.run(f'emapper.py {optstring}', shell = True)
 
 
