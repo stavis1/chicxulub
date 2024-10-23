@@ -106,12 +106,9 @@ process eggnog_db_setup {
     tuple val(id), path(id)
 
     script:
-    // """
-    // mkdir $id
-    // eggnog_wrapper.py --task download --options $options --run_args '-y --data_dir $id'
-    // """
     """
-    ln -s $launchDir/8350e5a3e24c153df2275c9f80692773 $id
+    mkdir $id
+    eggnog_wrapper.py --task download --options $options --run_args '-y --data_dir $id'
     """
 }
 
