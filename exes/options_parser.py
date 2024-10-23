@@ -12,7 +12,10 @@ with open(args.params, 'rb') as toml:
     options = tomllib.load(toml)
 
 #make toml formatted params files
-toml_files = ['download_eggnog_data_params', 'emapper_params', 'feature_mapper_params']
+toml_files = ['download_eggnog_data_params', 
+              'emapper_params', 
+              'feature_mapper_params',
+              'eggnog_quantification_params']
 for file in toml_files:
     with open(file, 'wb') as toml:
         tomli_w.dump(options[file], toml)

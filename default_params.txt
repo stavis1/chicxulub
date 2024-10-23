@@ -21,12 +21,25 @@ tax_scope = '2,2157,2759,1' #The order of these taxids controls preference. This
 target_orthologs = 'all' #One {experimental,non-electronic,all}.
 go_evidence = 'non-electronic' #One of {experimental,non-electronic,all}.
 
+[eggnog_quantification_params]
+#The protein name separator must be the same here and under K in [percolator_params] and pinfile_protein_delimiter in [comet_params].
+protein_delimiter = ';'
+
+#These are column names in the *.emapper.annotations files for which the elements will be quantified.
+annotation_classes = ['GOs', 'EC', 'KEGG_ko', 'KEGG_Pathway', 'KEGG_Module', 'KEGG_Reaction', 
+                    'KEGG_rclass', 'BRITE', 'KEGG_TC', 'CAZy', 'BiGG_Reaction', 'PFAMs']
+
 [percolator_params]
 #Any of the percolator command line parameters can be placed in this section.
 #To initialize percolator with a weights file uncomment the next line and specify the file by absolute path.
 #init-weights = '/absolute/path/to/saved/weights/file'
-K = "';'"   #this specifies the protein name separator, the single quotes are needed to not break the command line
+
+#The file name to save weights to. This file will not be tracked by nextflow and will only be stored under the work/ directory.
 weights = 'saved_weights'
+
+#This specifies the protein name separator, the single quotes are needed to not break the command line.
+#The protein name separator must be the same here and under protein_delimiter in [eggnog_quantification_params] and pinfile_protein_delimiter in [comet_params].
+K = "';'" 
 
 [dinosaur_params]
 averagineCorr = 0.6
@@ -144,7 +157,10 @@ activation_method = 'ALL'                # activation method; used if activation
 #
 digest_mass_range = '600.0 5000.0'       # MH+ peptide mass range to analyze
 peptide_length_range = '5 50'            # minimum and maximum peptide length to analyze (default min 1 to allowed max 51)
+
+#The protein name separator must be the same here and under K in [percolator_params] and protein_delimiter in [eggnog_quantification_params]
 pinfile_protein_delimiter = ';'          # blank = default 'tab' delimiter between proteins; enter a char/string to use in place of the tab; Percolator pin output only
+
 num_results = 100                      # number of results to store internally for Sp rank only; if Sp rank is not used, set this to num_output_lines
 max_duplicate_proteins = 10            # maximum number of additional duplicate protein names to report for each peptide ID; -1 reports all duplicates
 max_fragment_charge = 3                # set maximum fragment charge state to analyze (allowed max 5)
