@@ -154,12 +154,12 @@ process eggnog_search {
     tuple val(id), path(eggnog_database), path(faa_file), path(search_options)
 
     output:
-    tuple val(id), path("${faa_file}.annotations")
+    tuple val(id), path("${faa_file}.emapper.annotations")
 
     script:
     """
     mkdir $id
-    eggnog_wrapper.py --task search --options $search_options --run_args '-i $faa_file -o ${faa_file}.annotations --output_dir ./ --data_dir $eggnog_database'
+    eggnog_wrapper.py --task search --options $search_options --run_args '-i $faa_file -o ${faa_file} --output_dir ./ --data_dir $eggnog_database'
     """
 }
 
