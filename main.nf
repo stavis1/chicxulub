@@ -199,10 +199,13 @@ process qauantify_annotations {
 
 process merge_quantified_annotations {
     container 'stavisvols/quantify_annotations:latest'
-    publishDir params.results_dir, mode: 'copy', pattern: '*.quantification*'
+    publishDir params.results_dir, mode: 'copy'
 
     input:
     val quantified_annotations
+
+    output:
+    path '*.quantification'
 
     script:
     """
@@ -242,7 +245,7 @@ workflow {
     //quantify annotations and merge results
     qauantify_annotations(feature_mapper.out, annotated_faas)
         | flatten
-        | unique {it.getName()}
+        | unique { it.getName() }
         | collect
         | merge_quantified_annotations
 }
