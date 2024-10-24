@@ -180,7 +180,7 @@ process qauantify_annotations {
 
     script:
     //calculate job hash to identify correct annotated fasta
-    dl_params_hash = options.find {it.getName() == 'download_eggnog_data_params'}
+    dl_params_hash = path(options.find {it.getName() == 'download_eggnog_data_params'}.toUriString())
     dl_params_hash = dl_params_hash.text.digest('MD2')
     search_params_hash = options.find {it.getName() == 'emapper_params'}
     search_params_has = search_params_hash.text.digest('MD2')
