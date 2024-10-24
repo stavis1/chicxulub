@@ -119,6 +119,8 @@ process eggnog_db_setup {
 }
 
 process collect_eggnog_search_jobs {
+    cache false
+
     input:
     tuple val(row), val(options), path(mzml), val(faa)
     val eggnog_db_list
