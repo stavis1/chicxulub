@@ -160,6 +160,46 @@ process eggnog_search {
     """
 }
 
+process qauantify_annotations {
+    container 'stavisvols/quantify_annotations:latest'
+
+    input:
+    tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features), path(intensities)
+    val annotated_faas
+
+    output:
+    tuple path('*.quants') path(options)
+
+    script:
+    //calculate job hash to identify correct annotated fasta
+    dl_params_hash = options.find {it.getName() == 'download_eggnog_data_params'}
+    dl_params_hash = dl_params_hash.text.digest('MD2')
+    search_params_hash = options.find {it.getName() == 'emapper_params'}
+    search_params_has = search_params_hash.text.digest('MD2')
+    faa_hash = faa.text.digest('MD2')
+    id = dl_params_hash + search_params_hash + faa_hash
+
+    //find annotated fasta
+    annotations = annotated_faas.find {it[0] == id}[1]
+    
+    """
+    python /scripts/quantify_annotations.py --eggnog $annotations --peptides $intensities --toml eggnog_quantification_params --out $intensities
+    """
+}
+
+process merge_quantified_annotations {
+    container 'stavisvols/quantify_annotations:latest'
+    publishDir params.results_dir, mode: 'copy', pattern: 'merged*'
+
+    input:
+    val quantified_annotations
+
+    script:
+    """
+    python --toml eggnog_quantification_params --extension quants --out merged --data_dir ./
+    """
+}
+
 workflow {    
     //parse the combined parameters file
     design = Channel.of(file(params.design)).splitCsv(header : true, sep : '\t', strip : true)
@@ -181,12 +221,17 @@ workflow {
         | eggnog_search
         | toList
 
-    //identification
+    //identify peptides
     comet(params_parser.out)
     percolator(comet.out)
     
-    //quantification
+    //quantify peptides
     dinosaur(percolator.out)
     feature_mapper(dinosaur.out)
+
+    //quantify annotations and merge results
+    qauantify_annotations(feature_mapper.out, annotated_faas)
+        | toList
+        | merge_quantified_annotations
 }
 
