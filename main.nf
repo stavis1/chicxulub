@@ -97,7 +97,9 @@ process feature_mapper {
 }
 
 process eggnog_db_setup {
-    //container 'stavisvols/eggnog_for_pipeline:latest'
+    container 'stavisvols/eggnog_for_pipeline:latest'
+    containerOptions "--bind $projectDir/cache:/cache/"
+    publishDir "$projectDir/cache/", mode: 'copy', pattern: "$id"
 
     input:
     tuple val(id), path(options)
@@ -106,12 +108,13 @@ process eggnog_db_setup {
     tuple val(id), path(id)
 
     script:
-    // """
-    // mkdir $id
-    // eggnog_wrapper.py --task download --options $options --run_args '-y --data_dir $id'
-    // """
     """
-    cp -r $launchDir/8350e5a3e24c153df2275c9f80692773 .
+    if [ -e /cache/$id ]; then
+        cp /cache/$id ./
+    else
+        mkdir $id
+        eggnog_wrapper.py --task download --options $options --run_args '-y --data_dir $id'
+    fi
     """
 }
 
