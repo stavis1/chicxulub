@@ -15,3 +15,6 @@ docker push stavisvols/feature_mapper
 
 docker build -t stavisvols/eggnog_for_pipeline -f eggnog.dockerfile ./
 docker push stavisvols/eggnog_for_pipeline
+
+docker build -t stavisvols/quantify_annotations -f quantify_annotations.dockerfile ./
+docker push stavisvols/quantify_annotations
