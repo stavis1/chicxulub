@@ -99,7 +99,7 @@ process feature_mapper {
 process eggnog_db_setup {
     container 'stavisvols/eggnog_for_pipeline:latest'
     containerOptions "--bind $projectDir/cache:/cache/"
-    publishDir "$projectDir/cache/", mode: 'copy', pattern: "$id"
+    publishDir "$projectDir/cache/", mode: 'copy', pattern: "$id", overwrite: false
 
     input:
     tuple val(id), path(options)
