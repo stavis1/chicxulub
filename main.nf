@@ -173,7 +173,7 @@ process qauantify_annotations {
     val annotated_faas
 
     output:
-    tuple path('*.quants') path(options)
+    tuple path('*.quants'), path(options)
 
     script:
     //calculate job hash to identify correct annotated fasta
