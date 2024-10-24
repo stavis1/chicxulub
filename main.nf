@@ -111,7 +111,7 @@ process eggnog_db_setup {
     // eggnog_wrapper.py --task download --options $options --run_args '-y --data_dir $id'
     // """
     """
-    cp $launchDir/8350e5a3e24c153df2275c9f80692773 .
+    cp -r $launchDir/8350e5a3e24c153df2275c9f80692773 .
     """
 }
 
