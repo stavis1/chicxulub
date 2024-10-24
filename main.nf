@@ -110,7 +110,7 @@ process eggnog_db_setup {
     script:
     """
     if [ -e /cache/$id ]; then
-        cp /cache/$id ./
+        cp -r /cache/$id ./
     else
         mkdir $id
         eggnog_wrapper.py --task download --options $options --run_args '-y --data_dir $id'
