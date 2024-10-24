@@ -202,7 +202,7 @@ process merge_quantified_annotations {
     publishDir params.results_dir, mode: 'copy'
 
     input:
-    val quantified_annotations
+    path quantified_annotations
 
     output:
     path '*.quantification'
