@@ -162,11 +162,8 @@ process eggnog_search {
     tuple val(id), path("${faa_file}.emapper.annotations")
 
     script:
-    // """
-    // eggnog_wrapper.py --task search --options $search_options --run_args '-i $faa_file -o ${faa_file} --output_dir ./ --data_dir $eggnog_database'
-    // """
     """
-    cp $launchDir/*emapper* .
+    eggnog_wrapper.py --task search --options $search_options --run_args '-i $faa_file -o ${faa_file} --output_dir ./ --data_dir $eggnog_database'
     """
 }
 
