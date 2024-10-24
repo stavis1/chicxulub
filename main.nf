@@ -106,9 +106,12 @@ process eggnog_db_setup {
     tuple val(id), path(id)
 
     script:
+    // """
+    // mkdir $id
+    // eggnog_wrapper.py --task download --options $options --run_args '-y --data_dir $id'
+    // """
     """
-    mkdir $id
-    eggnog_wrapper.py --task download --options $options --run_args '-y --data_dir $id'
+    cp $launchDir/8350e5a3e24c153df2275c9f80692773 .
     """
 }
 
@@ -154,9 +157,11 @@ process eggnog_search {
     tuple val(id), path("${faa_file}.emapper.annotations")
 
     script:
+    // """
+    // eggnog_wrapper.py --task search --options $search_options --run_args '-i $faa_file -o ${faa_file} --output_dir ./ --data_dir $eggnog_database'
+    // """
     """
-    mkdir $id
-    eggnog_wrapper.py --task search --options $search_options --run_args '-i $faa_file -o ${faa_file} --output_dir ./ --data_dir $eggnog_database'
+    cp $launchDir/*emapper* .
     """
 }
 
