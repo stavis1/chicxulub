@@ -81,7 +81,7 @@ process feature_mapper {
     tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features)
 
     output:
-    tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features), path("${basename_peptides}.intensities"), path(options)
+    tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features), path("${basename_peptides}.intensities"), path(options), path(faa)
 
     script:
     basename_peptides = peptides.getName()
@@ -174,7 +174,7 @@ process qauantify_annotations {
     container 'stavisvols/quantify_annotations:latest'
 
     input:
-    tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features), path(intensities), val(option_paths)
+    tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features), path(intensities), val(option_paths), val(faa_path)
     val annotated_faas
 
     output:
@@ -186,7 +186,7 @@ process qauantify_annotations {
     dl_params_hash = dl_params_hash.text.digest('MD2')
     search_params_hash = option_paths.find {it.getName() == 'emapper_params'}
     search_params_hash = search_params_hash.text.digest('MD2')
-    faa_hash = faa.text.digest('MD2')
+    faa_hash = faa_path.text.digest('MD2')
     id = dl_params_hash + search_params_hash + faa_hash
 
     //find annotated fasta
