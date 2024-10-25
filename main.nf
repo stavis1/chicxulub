@@ -153,7 +153,7 @@ process collect_eggnog_search_jobs {
 }
 
 process eggnog_search {
-    //container 'stavisvols/eggnog_for_pipeline:latest'
+    container 'stavisvols/eggnog_for_pipeline:latest'
 
     input:
     tuple val(id), path(eggnog_database), path(faa_file), path(search_options)
