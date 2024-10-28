@@ -13,17 +13,13 @@
 #parse inputs
 temp_dir=$(realpath $1)
 raw_dir=$(realpath $2)
+msconvert=$(realpath $3)
 
 #set up workspace
 if [ ! -d $temp_dir ]; then
 	mkdir $temp_dir
 fi
 cd $temp_dir
-
-#build msconvert singularity image
-unset XDG_RUNTIME_DIR
-singularity build msconvert.img docker://stavisvols/msconvert:latest
-msconvert=$(realpath msconvert.img)
 
 #make a array job script
 cat > array_job.sbatch << 'EOL'
