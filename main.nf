@@ -274,7 +274,7 @@ workflow {
     
     mzmls = params_parser.out
         | branch {row, files, mzml, faa ->
-            convert: row.spectra.getExtension().toUpperCase() != 'MZML'
+            convert: row.spectra.toUpperCase() =~ /\.RAW/
                 return msconvert(row, files, mzml, faa, msconvert[0])
             noconvert: true
         }
