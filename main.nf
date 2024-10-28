@@ -1,7 +1,7 @@
 params.results_dir = launchDir
 
 process install_msconvert {
-    executor local
+    executor 'local'
 
     input:
     path design
