@@ -55,7 +55,7 @@ cp $raw $temp_dir/$pid/data
 cd $temp_dir/$pid
 
 #run msconvert
-singularity run --bind data/:/data/ --bind wine_temp:/wineprefix64 $msconvert bash /run_msconvert.sh "--outdir /data/ /data/$raw"
+singularity run --bind data/:/data/ --bind wine_temp:/wineprefix64 $msconvert wine msconvert --outdir /data/ /data/$raw
 
 #clean up workspace
 mv data/*.mzML $raw_dir
