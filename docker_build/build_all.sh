@@ -18,3 +18,6 @@ docker push stavisvols/eggnog_for_pipeline
 
 docker build -t stavisvols/quantify_annotations -f quantify_annotations.dockerfile ./
 docker push stavisvols/quantify_annotations
+
+docker build -t stavisvols/msconvert -f msconvert.dockerfile ./
+docker push stavisvols/msconvert
