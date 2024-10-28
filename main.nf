@@ -72,7 +72,7 @@ process msconvert {
         #move files back to nextflow working directory and clean up workspace
         mv data/*.mzML \$workdir/
         cd ..
-        rm -rf $pid
+        rm -rf \$pid
         """
 }
 
