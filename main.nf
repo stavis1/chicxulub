@@ -54,6 +54,9 @@ process msconvert {
         temp_dir=\$(cat msconvert_temp_dir_params)
 
         #set up workspace
+        if [ ! -d \$temp_dir ]; then
+            mkdir -p \$temp_dir
+        fi
         cd \$temp_dir
         pid=\$\$
         mkdir \$pid
