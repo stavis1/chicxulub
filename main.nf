@@ -37,39 +37,43 @@ process params_parser {
 
 process msconvert {
     input:
-    tuple val(row), path(options), path(file), path(faa), val(msconvert)
+    tuple val(row), path(options), path(file), path(faa)
+    val(msconvert)
 
     output:
     tuple val(row), path(options), path("${file.getSimpleName()}.mzML"), path(faa)
 
     script:
-    """
-    workdir=\$(pwd)
-    
-    #parse the options file to find where to put the temp directory
-    temp_dir=\$(cat msconvert_temp_dir_params)
+    if (file.getExtension().toUpperCase() == 'MZML')
+        ""
+    else
+        """
+        workdir=\$(pwd)
+        
+        #parse the options file to find where to put the temp directory
+        temp_dir=\$(cat msconvert_temp_dir_params)
 
-    #set up workspace
-    if [ ! -d \$temp_dir ]; then
-        mkdir \$temp_dir
-    fi
-    cd \$temp_dir
-    pid=\$\$
-    mkdir \$pid
-    cd \$pid
-    mkdir data
-    mkdir wine_temp
-    cp \$workdir/${file.getName()} data/
-    cp \$workdir/msconvert_params .
+        #set up workspace
+        if [ ! -d \$temp_dir ]; then
+            mkdir \$temp_dir
+        fi
+        cd \$temp_dir
+        pid=\$\$
+        mkdir \$pid
+        cd \$pid
+        mkdir data
+        mkdir wine_temp
+        cp \$workdir/${file.getName()} data/
+        cp \$workdir/msconvert_params .
 
-    #run msconvert
-    singularity run --bind wine_temp:wineprefix64 --bind data:/data/ $msconvert bash /run_msconvert.sh "--config msconvert_params --outdir /data/ /data/*" 
+        #run msconvert
+        singularity run --bind wine_temp:wineprefix64 --bind data:/data/ $msconvert bash /run_msconvert.sh "--config msconvert_params --outdir /data/ /data/*" 
 
-    #move files back to nextflow working directory and clean up workspace
-    mv data/*.mzML \$workdir/
-    cd ..
-    rm -rf $pid
-    """
+        #move files back to nextflow working directory and clean up workspace
+        mv data/*.mzML \$workdir/
+        cd ..
+        rm -rf $pid
+        """
 }
 
 process comet {
@@ -269,16 +273,9 @@ workflow {
     params_parser(design)
 
     //convert any raw files to .mzML
-    msconvert = install_msconvert()
+    msconvert_image = install_msconvert()
         | toList
-    
-    mzmls = params_parser.out
-        | branch {row, files, mzml, faa ->
-            convert: row.spectra.toUpperCase() =~ /\.RAW/
-                return msconvert(row, files, mzml, faa, msconvert[0])
-            noconvert: true
-        }
-        | concat
+    msconvert(params_parser.out, msconvert_image)
 
     //download the database files for each unique required eggnog DB
     eggnog_db_list = params_parser.out 
@@ -297,7 +294,7 @@ workflow {
         | toList
 
     //identify peptides
-    comet(mzmls)
+    comet(msconvert.out)
     percolator(comet.out)
     
     //quantify peptides
