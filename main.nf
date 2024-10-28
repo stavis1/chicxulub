@@ -45,7 +45,7 @@ process msconvert {
 
     script:
     if (file.getExtension().toUpperCase() == 'MZML')
-        ""
+        ":"
     else
         """
         workdir=\$(pwd)
