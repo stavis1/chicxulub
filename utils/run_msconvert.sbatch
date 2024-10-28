@@ -21,7 +21,7 @@ fi
 cd $temp_dir
 
 #build msconvert singularity image
-unset $XDG_RUNTIME_DIR
+unset XDG_RUNTIME_DIR
 singularity build msconvert.img docker://stavisvols/msconvert:latest
 msconvert=$(realpath msconvert.img)
 
