@@ -275,7 +275,7 @@ workflow {
     //convert any raw files to .mzML
     msconvert_image = install_msconvert()
         | toList
-    msconvert(params_parser.out, msconvert_image)
+    msconvert(params_parser.out, msconvert_image[0])
 
     //download the database files for each unique required eggnog DB
     eggnog_db_list = params_parser.out 
