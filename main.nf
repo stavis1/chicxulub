@@ -11,7 +11,7 @@ process install_msconvert {
     if grep -qi '.raw' $launchDir/${params.design}; then
         cd $projectDir/cache/
         if [ ! -f msconvert.img ]; then
-            singularity build docker://stavisvols/msconvert:latest
+            singularity build msconvert.img docker://stavisvols/msconvert:latest
         fi
     fi
     """
