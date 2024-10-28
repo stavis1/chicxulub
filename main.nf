@@ -3,15 +3,12 @@ params.results_dir = launchDir
 process install_msconvert {
     executor 'local'
 
-    input:
-    path design
-
     output:
     val "$projectDir/cache/msconvert.img"
 
     script:
     """
-    if grep -qi '.raw' $design; then
+    if grep -qi '.raw' $launchDir/${params.design}; then
         cd $projectDir/cache/
         if [ ! -f msconvert.img ]; then
             singularity build docker://stavisvols/msconvert:latest
@@ -272,7 +269,7 @@ workflow {
     params_parser(design)
 
     //convert any raw files to .mzML
-    msconvert = install_msconvert(params.design)
+    msconvert = install_msconvert()
         | toList
     
     mzmls = params_parser.out
