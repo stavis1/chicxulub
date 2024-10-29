@@ -28,8 +28,11 @@ with open('percolator_params', 'w') as percolator:
         percolator.write(f'{flag} {val}\n')
 
 #dinosaur
+def k_eq_v(opts):
+    return '\n'.join(f'{k}={v}' if type(v) != bool else str(k) for k,v in opts.items())
+
 with open('dinosaur_params', 'w') as dinosaur:
-    dinosaur.write('\n'.join(f'{k}={v}' for k,v in options['dinosaur_params'].items()))
+    dinosaur.write(k_eq_v(options['dinosaur_params']))
 
 #commet
 with open('comet_params', 'w') as comet:
@@ -40,10 +43,10 @@ with open('comet_params', 'w') as comet:
     comet.write('[COMET_ENZYME_INFO]\n')
     comet.write(options['comet_params']['COMET_ENZYME_INFO'])
 
-#msconverts
+#msconvert
 with open('msconvert_temp_dir_params', 'w') as txt:
     txt.write(options['msconvert_params']['temp_dir'])
-
 del options['msconvert_params']['temp_dir']
-with open('msconvert_params', 'wb') as toml:
-    tomli_w.dump(options['msconvert_params'], toml)
+
+with open('msconvert_params', 'w') as msconvert:
+    msconvert.write(k_eq_v(options['msconvert_params']))
