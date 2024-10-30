@@ -88,6 +88,7 @@ with open(args.toml, 'rb') as toml:
 #read eggnog data
 eggnog = pd.read_csv(args.eggnog, skiprows = 4, sep = '\t')
 eggnog = eggnog[[not p.startswith('##') for p in eggnog['#query']]]
+eggnog['COG_category'] = [','.join(c) for c in eggnog['COG_category']]
 
 #add organism information to eggnog file
 if args.organisms:
