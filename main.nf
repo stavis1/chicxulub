@@ -226,6 +226,7 @@ process eggnog_search {
 
 process qauantify_annotations {
     container 'stavisvols/quantify_annotations:latest'
+    containerOptions "--bind $launchDir:/data/"
 
     input:
     tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features), path(intensities), val(option_paths), val(faa_path)
@@ -247,7 +248,12 @@ process qauantify_annotations {
     annotations = annotated_faas.find {it[0] == id}[1]
     
     """
-    python /scripts/quantify_annotations.py --eggnog $annotations --peptides $intensities --toml eggnog_quantification_params --out $intensities
+    if [ -f "/data/${row.organism_map}" ]; then
+        cp /data/${row.organism_map} organism_map
+        python /scripts/quantify_annotations.py --eggnog $annotations --peptides $intensities --toml eggnog_quantification_params --out $intensities --organims organism_map
+    else
+        python /scripts/quantify_annotations.py --eggnog $annotations --peptides $intensities --toml eggnog_quantification_params --out $intensities
+    fi
     """
 }
 

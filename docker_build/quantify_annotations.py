@@ -16,6 +16,8 @@ parser.add_argument('-t', '--toml', action = 'store', required = True,
                     help = 'The options toml.')
 parser.add_argument('-o', '--out', action = 'store', required = True,
                     help = 'The base name for all results files.')
+parser.add_argument('-m', '--organisms', action = 'store', required = False, default = False,
+                    help = 'A tab separated mapping between fasta headers and organism IDs.')
 args = parser.parse_args()
 
 import tomllib
@@ -83,13 +85,23 @@ class Peptide:
 with open(args.toml, 'rb') as toml:
     options = tomllib.load(toml)
 
-#collect eggnog annotation information
+#read eggnog data
 eggnog = pd.read_csv(args.eggnog, skiprows = 4, sep = '\t')
 eggnog = eggnog[[not p.startswith('##') for p in eggnog['#query']]]
+
+#add organism information to eggnog file
+if args.organisms:
+    organism_file = pd.read_csv(args.organisms, sep = '\t', header = None)
+    organism_map = defaultdict(lambda : '-',
+                               {header.split()[0]:org for header, org in zip(organism_file.iloc[:,0], organism_file.iloc[:,1])})
+    options['annotation_classes'] += ['organism']
+    eggnog['organism'] = [organism_map[p] for p in eggnog['#query']]
+
+#collect eggnog annotation information
 protein_annotations = {}
 for ann_type in options['annotation_classes']:
     protein_annotation_map = {prot:anns.split(',') for prot, anns in zip(eggnog['#query'], eggnog[ann_type]) if anns != '-'}
-    protein_annotations[ann_type] = defaultdict(lambda: [], protein_annotation_map)
+    protein_annotations[ann_type] = defaultdict(lambda: [], protein_annotation_map)    
 
 #collect peptide information
 peptide_quants = pd.read_csv(args.peptides, sep = '\t')
