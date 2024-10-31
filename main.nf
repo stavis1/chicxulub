@@ -80,6 +80,7 @@ process msconvert {
 
         #move files back to nextflow working directory
         mv data/*.mzML \$workdir/
+        cd \$workdir/
         echo \$pid > dir_to_clean
         """
 }
