@@ -20,6 +20,7 @@ m = 'diamond'
 sensmode = 'very-sensitive' #One of {default,fast,mid-sensitive,sensitive,more-sensitive,very-sensitive,ultra-sensitive}.
 dmnd_iterate = 'yes'
 #annotation options:
+dbmem = true
 tax_scope = '2,2157,2759,1' #The order of these taxids controls preference. This default setting is bacteria > archaea > eukaryotes > everything.
 target_orthologs = 'all' #One {experimental,non-electronic,all}.
 go_evidence = 'non-electronic' #One of {experimental,non-electronic,all}.

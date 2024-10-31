@@ -211,6 +211,10 @@ process collect_eggnog_search_jobs {
 
 process eggnog_search {
     container 'stavisvols/eggnog_for_pipeline:latest'
+    containerOptions "--bind $launchDir/emapper_cache:/cache/"
+    publishDir "$launchDir/emapper_cache/$id", mode: 'copy', pattern: "${faa_file}.emapper.annotations", overwrite: false
+    beforeScript "if [ ! -d $launchDir/emapper_cache/$id ]; then mkdir -p $launchDir/emapper_cache/$id; fi"
+
 
     input:
     tuple val(id), path(eggnog_database), path(faa_file), path(search_options)
@@ -220,7 +224,11 @@ process eggnog_search {
 
     script:
     """
-    eggnog_wrapper.py --task search --options $search_options --run_args '-i $faa_file -o ${faa_file} --output_dir ./ --data_dir $eggnog_database'
+    if [ -f /cache/$id/${faa_file}.emapper.annotations ]; then
+        cp /cache/$id/${faa_file}.emapper.annotations ${faa_file}.emapper.annotations
+    else
+        eggnog_wrapper.py --task search --options $search_options --run_args '-i $faa_file -o ${faa_file} --output_dir ./ --data_dir $eggnog_database'
+    fi
     """
 }
 
