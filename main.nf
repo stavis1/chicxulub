@@ -97,6 +97,7 @@ process comet {
 process percolator {
     container 'stavisvols/percolator_for_pipeline:latest'
     publishDir params.results_dir, mode: 'copy', pattern: '*.{psms,peptides}*'
+    containerOptions "--bind $launchDir:/data/"
 
     input:
     tuple val(row), path(options), path(mzml), path(faa), path(pin)

@@ -35,8 +35,8 @@ annotation_classes = ['COG_category', 'GOs', 'EC', 'KEGG_ko', 'KEGG_Pathway', 'K
 
 [percolator_params]
 #Any of the percolator command line parameters can be placed in this section.
-#To initialize percolator with a weights file uncomment the next line and specify the file by absolute path.
-#init-weights = '/absolute/path/to/saved/weights/file'
+#To initialize percolator with a weights file uncomment the next line and specify the file by name. The weights file must be added to the directory you start nextflow from.
+#init-weights = 'weights_file_name'
 
 #The file name to save weights to. This file will not be tracked by nextflow and will only be stored under the work/ directory.
 weights = 'saved_weights'

@@ -23,8 +23,12 @@ for file in toml_files:
 #percolator
 with open('percolator_params', 'w') as percolator:
     for k, v in options['percolator_params'].items():
-        flag = f'--{k}' if len(k) > 1 else f'-{k}'
-        val = v if type(v) != bool else ''
+        if k == 'init-weights':
+            flag = '--init-weights'
+            val = f'/data/{v}'
+        else:
+            flag = f'--{k}' if len(k) > 1 else f'-{k}'
+            val = v if type(v) != bool else ''
         percolator.write(f'{flag} {val}\n')
 
 #dinosaur
