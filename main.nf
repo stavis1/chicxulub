@@ -37,10 +37,12 @@ process params_parser {
 
 process msconvert {
     afterScript """
-    temp_dir=\$(cat msconvert_temp_dir_params)
-    dir_to_clean=\$(cat dir_to_clean)
-    cd \$temp_dir
-    rm -rf \$dir_to_clean
+    if [ -f dir_to_clean ]; then
+        temp_dir=\$(cat msconvert_temp_dir_params)
+        dir_to_clean=\$(cat dir_to_clean)
+        cd \$temp_dir
+        rm -rf \$dir_to_clean
+    fi
     """
 
     input:
