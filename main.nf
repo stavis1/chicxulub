@@ -1,20 +1,13 @@
 params.results_dir = launchDir
 
 process install_msconvert {
-    executor 'local'
+    container 'stavisvols/msconvert'
 
     output:
-    val "$projectDir/cache/msconvert.img"
+    val "$projectDir/cache/stavisvols-msconvert-latest.img"
 
     script:
-    """
-    if grep -qi '.raw' $launchDir/${params.design}; then
-        cd $projectDir/cache/
-        if [ ! -f msconvert.img ]; then
-            singularity build msconvert.img docker://stavisvols/msconvert:latest
-        fi
-    fi
-    """
+    ":"
 }
 
 process params_parser {
