@@ -36,6 +36,13 @@ process params_parser {
 }
 
 process msconvert {
+    afterScript """
+    temp_dir=\$(cat msconvert_temp_dir_params)
+    dir_to_clean=\$(cat dir_to_clean)
+    cd \$temp_dir
+    rm -rf \$dir_to_clean
+    """
+
     input:
     tuple val(row), path(options), path(file), path(faa)
     val(msconvert)
@@ -69,10 +76,9 @@ process msconvert {
         #run msconvert
         singularity run --bind wine_temp:/wineprefix64/ --bind data:/data/ ${msconvert[0]} bash /run_msconvert.sh "--config msconvert_params --outdir /data/ /data/*" 
 
-        #move files back to nextflow working directory and clean up workspace
+        #move files back to nextflow working directory
         mv data/*.mzML \$workdir/
-        cd ..
-        rm -rf \$pid && : || :
+        echo \$pid > dir_to_clean
         """
 }
 
