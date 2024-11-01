@@ -4,5 +4,5 @@ containers=("params_parser" "comet_for_pipeline" "percolator_for_pipeline" "dino
 
 for container in $containers
 do
-    singularty build cache/stavisvols-$container-latest.img docker://stavisvols/container:latest
+    singularity build cache/stavisvols-$container-latest.img docker://stavisvols/container:latest
 done
