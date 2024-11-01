@@ -1,7 +1,7 @@
 params.results_dir = launchDir
 
 process install_msconvert {
-    container 'stavisvols/msconvert'
+    container 'stavisvols/msconvert:latest'
 
     output:
     val "$projectDir/cache/stavisvols-msconvert-latest.img"

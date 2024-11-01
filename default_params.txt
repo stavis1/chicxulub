@@ -2,7 +2,7 @@
 #Each top-level table will be parsed into a separate params file with its own formatting, internal to the pipeline.
 
 [msconvert_params]
-temp_dir = '~/msconvert_temp'
+temp_dir = '/home/{you}/msconvert_temp'
 
 [download_eggnog_data_params]
 #Parameters for download_eggnog_data.py from eggnog-mapper.
