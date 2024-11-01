@@ -13,7 +13,7 @@ temp_dir = '~/msconvert_temp'
 #The pipeline will supply -i, -o, --output_dir, and --data_dir.
 #If you wish to add other parameters simply add a line with {flag} = '{value}'. 
 #If no value is associated with a flag use true.
-cpu = 4
+cpu = 10
 itype = 'proteins'
 #search options:
 m = 'diamond'
