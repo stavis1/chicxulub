@@ -79,7 +79,7 @@ num_threads = 4                        # 0=poll CPU to set num threads; else spe
 # PEFF - PSI Extended FASTA Format
 #
 peff_format = 0                        # 0=no (normal fasta, default), 1=PEFF PSI-MOD, 2=PEFF Unimod
-peff_obo =                             # path to PSI Mod or Unimod OBO file
+peff_obo = ''                            # path to PSI Mod or Unimod OBO file
 
 #
 # fragment ion index; limited to 5 variable mods and up to 5 modified residues per mod
