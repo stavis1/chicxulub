@@ -5,7 +5,7 @@ RUN apt-get update -y && \
 
 RUN mkdir /comet/ && \
     cd /comet/ && \
-    wget https://github.com/UWPR/Comet/releases/download/v2024.01.1/comet.linux.exe && \
+    wget https://github.com/UWPR/Comet/releases/download/v2024.02.0/comet.linux.exe && \
     chmod +x comet.linux.exe
 
 

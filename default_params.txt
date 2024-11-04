@@ -68,13 +68,19 @@ variable_c_alk = false
 FDR = 0.01
 
 [comet_params]
-header = '# comet_version 2024.01 rev. 1 (b236210)'
+header = '# comet_version 2024.02 rev. 0 (c40a2ed)'
 # Comet MS/MS search engine parameters file.
 # Everything following the '#' symbol is treated as a comment.
-
 decoy_search = 2                       # 0=no (default), 1=internal decoy concatenated, 2=internal decoy separate
 
 num_threads = 4                        # 0=poll CPU to set num threads; else specify num threads directly (max 128)
+
+#
+# PEFF - PSI Extended FASTA Format
+#
+peff_format = 0                        # 0=no (normal fasta, default), 1=PEFF PSI-MOD, 2=PEFF Unimod
+peff_obo =                             # path to PSI Mod or Unimod OBO file
+
 #
 # fragment ion index; limited to 5 variable mods and up to 5 modified residues per mod
 #
@@ -83,7 +89,7 @@ fragindex_min_ions_report = 3          # minimum number of matched fragment ion 
 fragindex_num_spectrumpeaks = 100      # number of peaks from spectrum to use for fragment ion index matching
 fragindex_min_fragmentmass = 200.0     # low mass cutoff for fragment ions
 fragindex_max_fragmentmass = 2000.0    # high mass cutoff for fragment ions
-fragindex_skipreadprecursors = 0       # 0=off, 1=read precursors to limit fragment ion index
+fragindex_skipreadprecursors = 0       # 0=read precursors to limit fragment ion index, 1=skip reading precursors
 
 #
 # masses
@@ -118,6 +124,7 @@ variable_mod04 = '0.0 X 0 3 -1 0 0 0.0'
 variable_mod05 = '0.0 X 0 3 -1 0 0 0.0'
 max_variable_mods_in_peptide = 5
 require_variable_mod = 0
+protein_modslist_file = ''               # limit variable mods to subset of specified proteins if this file is specified & present
 
 #
 # fragment ions
@@ -174,15 +181,17 @@ clip_nterm_methionine = 0              # 0=leave protein sequences as-is; 1=also
 spectrum_batch_size = 15000            # max. # of spectra to search at a time; 0 to search the entire scan range in one loop
 decoy_prefix = 'DECOY_'                  # decoy entries are denoted by this string which is pre-pended to each protein accession
 equal_I_and_L = 1                      # 0=treat I and L as different; 1=treat I and L as same
+mass_offsets = ''                        # one or more mass offsets to search (values substracted from deconvoluted precursor mass)
 
 #
 # spectral processing
 #
 minimum_peaks = 10                     # required minimum number of peaks in spectrum to search (default 10)
-minimum_intensity = 0                  # minimum intensity value to read in
+minimum_intensity = 0                 # minimum intensity value to read in
 remove_precursor_peak = 0              # 0=no, 1=yes, 2=all charge reduced precursor peaks (for ETD), 3=phosphate neutral loss peaks
 remove_precursor_tolerance = 1.5       # +- Da tolerance for precursor removal
 clear_mz_range = '0.0 0.0'               # clear out all peaks in the specified m/z range e.g. remove reporter ion region of TMT spectra
+percentage_base_peak = 0.0             # specify a percentage (e.g. "0.05" for 5%) of the base peak intensity as a minimum intensity threshold
 
 #
 # static modifications
