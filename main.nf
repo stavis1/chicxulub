@@ -69,7 +69,7 @@ process msconvert {
         cp \$workdir/msconvert_params .
 
         #run msconvert
-        singularity run --bind wine_temp:/wineprefix64/ --bind data:/data/ ${msconvert[0]} bash /run_msconvert.sh "--config msconvert_params --outdir /data/ /data/*" 
+        singularity run --bind wine_temp:/wineprefix64/ --bind data:/data/ ${msconvert[0]} bash /run_msconvert.sh "--config msconvert_params --outdir /data/ /data/*" && : || :
 
         #move files back to nextflow working directory
         mv data/*.mzML \$workdir/
