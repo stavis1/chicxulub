@@ -261,7 +261,7 @@ process qauantify_annotations {
     """
     if [ -f "/data/${row.organism_map}" ]; then
         cp /data/${row.organism_map} organism_map
-        python /scripts/quantify_annotations.py --eggnog $annotations --peptides $intensities --toml eggnog_quantification_params --out $intensities --organims organism_map
+        python /scripts/quantify_annotations.py --eggnog $annotations --peptides $intensities --toml eggnog_quantification_params --out $intensities --organisms organism_map
     else
         python /scripts/quantify_annotations.py --eggnog $annotations --peptides $intensities --toml eggnog_quantification_params --out $intensities
     fi
