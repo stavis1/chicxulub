@@ -73,7 +73,7 @@ header = '# comet_version 2024.02 rev. 0 (c40a2ed)'
 # Everything following the '#' symbol is treated as a comment.
 decoy_search = 2                       # 0=no (default), 1=internal decoy concatenated, 2=internal decoy separate
 
-num_threads = 4                        # 0=poll CPU to set num threads; else specify num threads directly (max 128)
+num_threads = 8                        # 0=poll CPU to set num threads; else specify num threads directly (max 128)
 
 #
 # PEFF - PSI Extended FASTA Format
