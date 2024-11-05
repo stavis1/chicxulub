@@ -46,11 +46,3 @@ with open('comet_params', 'w') as comet:
             comet.write(f'{k} = {v}\n')
     comet.write('[COMET_ENZYME_INFO]\n')
     comet.write(options['comet_params']['COMET_ENZYME_INFO'])
-
-#msconvert
-with open('msconvert_temp_dir_params', 'w') as txt:
-    txt.write(options['msconvert_params']['temp_dir'])
-del options['msconvert_params']['temp_dir']
-
-with open('msconvert_params', 'w') as msconvert:
-    msconvert.write(k_eq_v(options['msconvert_params']))
