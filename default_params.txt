@@ -1,10 +1,6 @@
 #This file is TOML formatted, see https://toml.io/en/ for details.
 #Each top-level table will be parsed into a separate params file with its own formatting, internal to the pipeline.
 
-[msconvert_params]
-#temp_dir must be an absolute path to a directory that is not on a lustre filesystem. 
-temp_dir = '/home/{you}/msconvert_temp'
-
 [download_eggnog_data_params]
 #Parameters for download_eggnog_data.py from eggnog-mapper.
 #If you wish to use one of the search tools other than diamond you will need to specify the databases here
