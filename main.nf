@@ -1,4 +1,4 @@
-params.results_dir = launchDir
+params.results_dir = "$launchDir/results"
 
 process params_parser {
     container 'stavisvols/params_parser:latest'
@@ -226,6 +226,9 @@ process merge_quantified_annotations {
 }
 
 workflow {    
+    //make results directory
+    file(params.results_dir).mkdir()
+
     //parse the combined parameters file
     design = Channel.of(file(params.design)).splitCsv(header : true, sep : '\t', strip : true)
     params_parser(design)
