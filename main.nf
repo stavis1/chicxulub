@@ -221,7 +221,7 @@ process merge_quantified_annotations {
 
     script:
     """
-    python /scripts/merge_quantified_annotations.py --toml eggnog_quantification_params --extension quants --out merged --data_dir ./
+    python /scripts/merge_quantified_annotations.py --toml eggnog_quantification_params --extension quants --pep_extension intensities --out merged --data_dir ./
     """
 }
 

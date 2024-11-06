@@ -14,6 +14,8 @@ parser.add_argument('-d', '--data_dir', action = 'store', required = False, defa
                     help = 'Where the data files to merge are stored.')
 parser.add_argument('-e', '--extension', action = 'store', required = True,
                     help = 'The file extension that single-run quantification files use.')
+parser.add_argument('-p', '--pep_extension', action = 'store', required = True,
+                    help = 'The file extension that single-run quantification files use.')
 parser.add_argument('-o', '--out', action = 'store', required = True,
                     help = 'The base name for all results files.')
 args = parser.parse_args()
@@ -45,5 +47,20 @@ for ann_type in options['annotation_classes']:
         data.append(newdata)
     data = pd.concat(data, axis = 1)
     data.to_csv(f'{args.out}.{ann_type}.quantification', sep = '\t', index = False)
-    
+
+#the peptide quantification files
+extension = re.compile(args.pep_extension)
+pep_files =  [os.path.join(args.data_dir, f) for f in os.listdir(args.data_dir) if f.endswith(args.pep_extension)]
+
+#make a merged output for peptide intensity quantifications
+data = []
+for f in files:
+    newdata = pd.read_csv(f, sep = '\t')
+    newdata.index = newdata['sequence']
+    del newdata['sequence']
+    suffix = re.sub(extension, '', f)
+    newdata.columns = [f'{c}_{suffix}' for c in newdata.columns]
+    data.append(newdata)
+data = pd.concat(data, axis = 1)
+data.to_csv(f'{args.out}.peptides.quantification', sep = '\t', index = False)
 
