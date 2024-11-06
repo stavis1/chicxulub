@@ -69,7 +69,7 @@ process dinosaur {
 
     script:
     """
-    timeout -k=1 30m java -Xmx16g -jar /dinosaur/Dinosaur.jar --advParams=dinosaur_params --concurrency=4 --nReport=0 --outName=${mzml} $mzml && : || :
+    timeout 30m java -Xmx16g -jar /dinosaur/Dinosaur.jar --advParams=dinosaur_params --concurrency=4 --nReport=0 --outName=${mzml} $mzml && : || :
     ls *.features.tsv
     """
 }
