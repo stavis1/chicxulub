@@ -28,7 +28,7 @@ process comet {
     tuple val(row), path(options), path(mzml), path(faa), path("${pin}.pin")
 
     script:
-    pin = mzml.getName()
+    pin = mzml.getBaseName()
     """
     /comet/comet.linux.exe -Pcomet_params -D$faa -N$pin $mzml
     grep -vE '[[:space:]]-?nan[[:space:]]' ${pin}.pin > tmp
@@ -48,7 +48,7 @@ process percolator {
     tuple val(row), path(options), path(mzml), path(faa), path(pin), path("${basename}.psms"), path("${basename}.peptides")
     
     script:
-    basename = pin.getName()
+    basename = pin.getBaseName()
     """
     percolator \\
         --parameter-file percolator_params \\
@@ -65,18 +65,18 @@ process dinosaur {
     tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides)
 
     output:
-    tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path("${mzml}.features.tsv")
+    tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path("${basename}.features.tsv")
 
     script:
+    basename = mzml.getBaseName()
     """
-    timeout 30m java -Xmx16g -jar /dinosaur/Dinosaur.jar --advParams=dinosaur_params --concurrency=4 --nReport=0 --outName=${mzml} $mzml && : || :
+    timeout 30m java -Xmx16g -jar /dinosaur/Dinosaur.jar --advParams=dinosaur_params --concurrency=4 --nReport=0 --outName=${basename} $mzml && : || :
     ls *.features.tsv
     """
 }
 
 process feature_mapper {
     container 'stavisvols/feature_mapper:latest'
-    publishDir params.results_dir, mode: 'copy', pattern: '*.intensities'
 
     input:
     tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features)
@@ -85,7 +85,7 @@ process feature_mapper {
     tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features), path("${basename_peptides}.intensities"), path(options), path(faa)
 
     script:
-    basename_peptides = peptides.getName()
+    basename_peptides = peptides.getBaseName()
     """
     python /mapper/feature_mapper.py \\
         --features $features \\
@@ -185,7 +185,7 @@ process qauantify_annotations {
     val annotated_faas
 
     output:
-    tuple path('*.quants'), path(options)
+    tuple path('*.quants'), path(options), path(intensities)
 
     script:
     //calculate job hash to identify correct annotated fasta
