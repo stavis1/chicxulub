@@ -155,9 +155,9 @@ process collect_eggnog_search_jobs {
 
 process eggnog_search {
     container 'stavisvols/eggnog_for_pipeline:latest'
-    containerOptions "--bind $launchDir/emapper_cache:/cache/"
-    publishDir "$launchDir/emapper_cache/$id", mode: 'copy', pattern: "${faa_file}.emapper.annotations", overwrite: false
-    beforeScript "if [ ! -d $launchDir/emapper_cache/$id ]; then mkdir -p $launchDir/emapper_cache/$id; fi"
+    containerOptions "--bind $workDir/emapper_cache:/cache/"
+    publishDir "$workDir/emapper_cache/$id", mode: 'copy', pattern: "${faa_file}.emapper.annotations", overwrite: false
+    beforeScript "if [ ! -d $workDir/emapper_cache/$id ]; then mkdir -p $workDir/emapper_cache/$id; fi"
 
 
     input:
