@@ -54,7 +54,7 @@ process percolator {
         --parameter-file percolator_params \\
         -m ${basename}.psms \\
         -r ${basename}.peptides \\
-        $basename
+        ${basename}.pin
     """
 }
 
