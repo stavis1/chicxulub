@@ -2,7 +2,7 @@ FROM ubuntu:24.04
 
 RUN apt-get update -y && \
     apt-get install -y wget && \
-    apt-get install procps
+    apt-get install -y procps
 
 RUN mkdir /comet/ && \
     cd /comet/ && \

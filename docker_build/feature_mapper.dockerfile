@@ -4,7 +4,7 @@ RUN mkdir /mapper
 COPY feature_mapper.py /mapper/
 
 RUN apt-get update -y && \
-    apt-get install procps
+    apt-get install -y procps
 
 COPY requirements.txt /
 RUN pip install -r /requirements.txt
