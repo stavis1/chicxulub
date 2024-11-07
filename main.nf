@@ -70,7 +70,8 @@ process dinosaur {
     script:
     basename = mzml.getBaseName()
     """
-    java -Xmx16g -jar /dinosaur/Dinosaur.jar --advParams=dinosaur_params --concurrency=4 --nReport=0 --outName=${basename} $mzml
+    timeout -k 5 30m java -Xmx16g -jar /dinosaur/Dinosaur.jar --advParams=dinosaur_params --concurrency=4 --nReport=0 --outName=${basename} $mzml && : || :
+    ls *.features.tsv
     """
 }
 
