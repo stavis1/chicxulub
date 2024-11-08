@@ -54,7 +54,7 @@ pep_files =  [os.path.join(args.data_dir, f) for f in os.listdir(args.data_dir) 
 
 #make a merged output for peptide intensity quantifications
 data = []
-for f in files:
+for f in pep_files:
     newdata = pd.read_csv(f, sep = '\t')
     newdata.index = newdata['sequence']
     del newdata['sequence']
