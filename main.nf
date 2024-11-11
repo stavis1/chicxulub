@@ -150,7 +150,7 @@ process collect_eggnog_search_jobs {
     faa.mklink(linked_faa)
 
     //calculate job hash for uniqueness check
-    results_id = dl_params_hash + search_params.text.digest('MD2') + faa.text.digest('MD2')
+    results_id = dl_params_hash + search_params.text.digest('MD2') + faa.getBaseName()
 }
 
 process eggnog_search {
@@ -193,8 +193,8 @@ process qauantify_annotations {
     dl_params_hash = dl_params_hash.text.digest('MD2')
     search_params_hash = option_paths.find {it.getName() == 'emapper_params'}
     search_params_hash = search_params_hash.text.digest('MD2')
-    faa_hash = faa_path.text.digest('MD2')
-    id = dl_params_hash + search_params_hash + faa_hash
+    faa_name = faa_path.getBaseName()
+    id = dl_params_hash + search_params_hash + faa_name
 
     //find annotated fasta
     annotations = annotated_faas.find {it[0] == id}[1]
