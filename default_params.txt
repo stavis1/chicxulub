@@ -10,7 +10,7 @@
 #The pipeline will supply -i, -o, --output_dir, and --data_dir.
 #If you wish to add other parameters simply add a line with {flag} = '{value}'. 
 #If no value is associated with a flag use true.
-cpu = 10
+cpu = 20
 itype = 'proteins'
 #search options:
 m = 'diamond'
