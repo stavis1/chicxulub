@@ -62,5 +62,5 @@ for f in pep_files:
     newdata.columns = [f'{c}_{suffix}' for c in newdata.columns]
     data.append(newdata)
 data = pd.concat(data, axis = 1)
-data.to_csv(f'{args.out}.peptides.quantification', sep = '\t', index = False)
+data.to_csv(f'{args.out}.peptides.quantification', sep = '\t')
 
