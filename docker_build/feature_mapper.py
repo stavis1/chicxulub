@@ -62,7 +62,7 @@ aa_masses = {'G':57.021463735,
 
 class Feature:
     def __init__(self, start, end, mz, intensity):
-        self.psms = []
+        self.queries = []
         self.start = start
         self.end = end
         self.mz = mz
@@ -73,7 +73,7 @@ class Feature:
         return self.hash
     
     def is_degenerate(self):
-        return len(set(psm.seq for psm in self.psms)) > 1
+        return len(set(query.seq for query in self.queries)) > 1
 
 class Psm:
     def __init__(self, name, seq, pep):
@@ -82,27 +82,43 @@ class Psm:
         self.scan = int(re.search(r'(\d+)_\d+_\d+\Z', name).group(1))        
         self.seq = re.search(r'\.((?:[A-Z](?:\[[^\]]+\])?)+)\.', seq).group(1)
         self.charge = int(re.search(r'(\d+)_\d+\Z', name).group(1))
-        self.mass = self.calc_peptide_mass()
-        self.mz = (self.mass/self.charge) + H
         self.rt = scan_rt[self.scan]
         self.features = []
-    
-    def calc_peptide_mass(self):
-        mass = np.sum([aa_masses[aa] for aa in re.findall(r'[A-Z]', self.seq)])
-        mass += np.sum([float(mod) for mod in re.findall(r'\d+(?:\.\d+)?', self.seq)])
-        mass += H2O
-        return mass
+
+class Query:
+    def __init__(self, mz, rt, seq):
+        self.hash = hash((mz, rt, seq))
+        self.mz = mz
+        self.rt = rt
+        self.seq = seq
+        
+    def __hash__(self):
+        return self.hash
 
 class Peptide():
     def __init__(self, seq, prots):
         self.seq = re.search(r'\.((?:[A-Z](?:\[[^\]]+\])?)+)\.', seq).group(1)
         self.prots = prots
         self.psms = []
+        self.queries = []
         self.features = set()
     
     def add_psm(self, psm):
         self.psms.append(psm)
-        self.features.update(feature_map[hash(f)] for f in psm.features)
+    
+    def make_queries(self):
+        self.queries = [Query(p.mz, p.rt, self.seq) for p in self.psms]
+        obs_charges = set(psm.charge for psm in self.psms)
+        mean_rt = np.mean([psm.rt for psm in self.psms])
+        pepmass = self.calc_peptide_mass()
+        required_charges = [c for c in params.charges if c not in obs_charges]
+        self.queries.extend([Query(pepmass/c, mean_rt, self.seq) for c in required_charges])
+        return self.queries
+    
+    def find_queries(self, query_map):
+        hashes = [hash(q) for q in self.queries]
+        self.queries = [query_map[h] for h in hashes]
+        self.features = set([feature_map[hash(f)] for q in queries for f in q.features])
     
     def remove_bad_features(self):
         self.features = set(f for f in self.features if not f.is_degenerate())
@@ -117,14 +133,20 @@ class Peptide():
                 self.intensity,
                 self.prots)
 
-def attach_features(psm):
-    started_before = set(f[1] for f in rt_starts.irange((psm.rt - max_Δrt, ), (psm.rt,)))
-    ended_after = set(f[1] for f in rt_ends.irange((psm.rt, ), (psm.rt + max_Δrt,)))
-    Δmz = (psm.mz/1e6)*params['ppm']
-    mz_matched = set(f[1] for f in mzs.irange((psm.mz - Δmz,), (psm.mz + Δmz,)))
+    def calc_peptide_mass(self):
+        mass = np.sum([aa_masses[aa] for aa in re.findall(r'[A-Z]', self.seq)])
+        mass += np.sum([float(mod) for mod in re.findall(r'\d+(?:\.\d+)?', self.seq)])
+        mass += H2O
+        return mass
+
+def attach_features(query):
+    started_before = set(f[1] for f in rt_starts.irange((query.rt - max_Δrt, ), (query.rt,)))
+    ended_after = set(f[1] for f in rt_ends.irange((query.rt, ), (query.rt + max_Δrt,)))
+    Δmz = (query.mz/1e6)*params['ppm']
+    mz_matched = set(f[1] for f in mzs.irange((query.mz - Δmz,), (query.mz + Δmz,)))
     features = started_before.intersection(ended_after).intersection(mz_matched)
-    psm.features = features
-    return psm
+    query.features = features
+    return query
 
 #map scan numbers to retention times
 run = pymzml.run.Reader(args.mzml)
@@ -155,26 +177,32 @@ peptides = [Peptide(seq, prots) for seq, prots in zip(peptide_table['peptide'], 
 observed_peptides = set([p.seq for p in peptides])
 psms = [psm for psm in psms if psm.seq in observed_peptides]
 
+#map psms to peptides
+peptide_map = {p.seq:p for p in peptides}
+for psm in psms:
+    peptide_map[psm.seq].add_psm(psm)
+
+#get feature queries
+queries = [q for peptide in peptides for q in peptide.make_queries()]
+
 #set up data structures for fast lookup
 rt_starts = SortedList([(f.start, f) for f in features], key = lambda x: x[0])
 rt_ends = SortedList([(f.end, f) for f in features], key = lambda x: x[0])
 max_Δrt = max(f.end - f.start for f in features)
 mzs = SortedList([(f.mz, f) for f in features], key = lambda x: x[0])
-peptide_map = {p.seq:p for p in peptides}
 feature_map = {hash(f):f for f in features}
 
-#map features to psms
+#map queries to features
 with Pool(params['cores']) as p:
-    psms = p.map(attach_features, psms)
-
-#map psms to features
-for psm in psms:
+    queries = p.map(attach_features, queries)
+for query in queries:
     for feature in psm.features:
-        feature_map[hash(feature)].psms.append(psm)
+        feature_map[hash(feature)].queries.append(query)
 
-#map psms to peptides
-for psm in psms:
-    peptide_map[psm.seq].add_psm(psm)
+#map queries back to peptides b/c multiprocessing breaks the connection
+query_map = {hash(q):q for q in queries}
+for peptide in peptides:
+    peptide.find_queries(query_map)
 
 #report quantified peptides
 intensities = pd.DataFrame((pep.report() for pep in peptides),
