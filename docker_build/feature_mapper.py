@@ -107,10 +107,10 @@ class Peptide():
         self.psms.append(psm)
     
     def make_queries(self):
-        self.queries = [Query(p.mz, p.rt, self.seq) for p in self.psms]
+        pepmass = self.calc_peptide_mass()
+        self.queries = [Query(pepmass/p.charge, p.rt, self.seq) for p in self.psms]
         obs_charges = set(psm.charge for psm in self.psms)
         mean_rt = np.mean([psm.rt for psm in self.psms])
-        pepmass = self.calc_peptide_mass()
         required_charges = [c for c in params.charges if c not in obs_charges]
         self.queries.extend([Query(pepmass/c, mean_rt, self.seq) for c in required_charges])
         return self.queries
