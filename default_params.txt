@@ -62,6 +62,7 @@ ppm = 5
 cores = 4
 variable_c_alk = false
 FDR = 0.01
+charges = [1, 2, 3, 4]
 
 [comet_params]
 header = '# comet_version 2024.02 rev. 0 (c40a2ed)'
