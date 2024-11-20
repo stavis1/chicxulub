@@ -76,7 +76,7 @@ process dinosaur {
 }
 
 process feature_mapper {
-    container 'stavisvols/feature_mapper:latest'
+    container 'stavisvols/feature_mapper:dev'
 
     input:
     tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features)
