@@ -111,7 +111,7 @@ class Peptide():
         self.queries = [Query(pepmass/p.charge, p.rt, self.seq) for p in self.psms]
         obs_charges = set(psm.charge for psm in self.psms)
         mean_rt = np.mean([psm.rt for psm in self.psms])
-        required_charges = [c for c in params.charges if c not in obs_charges]
+        required_charges = [c for c in params['charges'] if c not in obs_charges]
         self.queries.extend([Query(pepmass/c, mean_rt, self.seq) for c in required_charges])
         return self.queries
     
