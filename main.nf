@@ -115,7 +115,6 @@ process eggnog_db_setup {
     else
         mkdir $id
         eggnog_wrapper.py --task download --options $options --run_args '-y --data_dir $id'
-        cp $id /cache/$id
     fi
     """
 }
