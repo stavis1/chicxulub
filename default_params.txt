@@ -27,8 +27,9 @@ go_evidence = 'non-electronic' #One of {experimental,non-electronic,all}.
 protein_delimiter = ';'
 
 #These are column names in the *.emapper.annotations files for which the elements will be quantified.
+#If you do not include an organism map file remove the 'organism' entry.
 annotation_classes = ['COG_category', 'GOs', 'EC', 'KEGG_ko', 'KEGG_Pathway', 'KEGG_Module', 'KEGG_Reaction', 
-                    'KEGG_rclass', 'BRITE', 'KEGG_TC', 'CAZy', 'BiGG_Reaction', 'PFAMs', 'Preferred_name']
+                    'KEGG_rclass', 'BRITE', 'KEGG_TC', 'CAZy', 'BiGG_Reaction', 'PFAMs', 'Preferred_name', 'organism']
 
 [percolator_params]
 #Any of the percolator command line parameters can be placed in this section.
