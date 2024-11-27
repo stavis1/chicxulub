@@ -28,7 +28,7 @@ process comet {
     tuple val(row), path(options), path(mzml), path(faa), path("${pin}.pin")
 
     script:
-    pin = mzml.getBaseName()
+    pin = row.identifier
     """
     /comet/comet.linux.exe -Pcomet_params -D$faa -N$pin $mzml
     grep -vE '[[:space:]]-?nan[[:space:]]' ${pin}.pin > tmp
@@ -48,7 +48,7 @@ process percolator {
     tuple val(row), path(options), path(mzml), path(faa), path(pin), path("${basename}.psms"), path("${basename}.peptides")
     
     script:
-    basename = pin.getBaseName()
+    basename = row.identifier
     """
     percolator \\
         --parameter-file percolator_params \\
@@ -68,7 +68,7 @@ process dinosaur {
     tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path("${basename}.features.tsv")
 
     script:
-    basename = mzml.getBaseName()
+    basename = row.identifier
     """
     timeout -k 5 30m java -Xmx16g -jar /dinosaur/Dinosaur.jar --advParams=dinosaur_params --concurrency=4 --nReport=0 --outName=${basename} $mzml && : || :
     ls *.features.tsv
@@ -85,7 +85,7 @@ process feature_mapper {
     tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features), path("${basename_peptides}.intensities"), path(options), path(faa)
 
     script:
-    basename_peptides = peptides.getBaseName()
+    basename_peptides = row.identifier
     """
     python /mapper/feature_mapper.py \\
         --features $features \\
