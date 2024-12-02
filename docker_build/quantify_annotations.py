@@ -81,6 +81,11 @@ class Peptide:
             #incoherent annotations show up in only a subset of proteins a peptide maps to.
             self.incoherent_annotations[ann_type] = all_annotations - self.coherent_annotations[ann_type]
             
+        #add protein as an annotation 
+        if len(self.proteins) == 1:
+            self.coherent_annotations['protein'] = self.proteins
+        self.incoherent_annotations['protein'] = self.proteins
+            
 #parse options file
 with open(args.toml, 'rb') as toml:
     options = tomllib.load(toml)
