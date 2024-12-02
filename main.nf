@@ -112,6 +112,8 @@ process eggnog_db_setup {
     """
     if [ -e /cache/$id ]; then
         cp -r /cache/$id ./
+    elif [ -e /cache/precomputed ]; then
+        mkdir $id
     else
         mkdir $id
         eggnog_wrapper.py --task download --options $options --run_args '-y --data_dir $id'
@@ -170,6 +172,8 @@ process eggnog_search {
     """
     if [ -f /cache/$id/${faa_file}.emapper.annotations ]; then
         cp /cache/$id/${faa_file}.emapper.annotations ${faa_file}.emapper.annotations
+    elif [ -e /cache/precomputed ]; then
+        cp /cache/precomputed/${faa_file}.emapper.annotations .
     else
         eggnog_wrapper.py --task search --options $search_options --run_args '-i $faa_file -o ${faa_file} --output_dir ./ --data_dir $eggnog_database'
     fi
