@@ -64,22 +64,23 @@ class Peptide:
     
     def annotate_self(self, protein_annotations):
         for ann_type in options['annotation_classes']:
-            annotations = [protein_annotations[ann_type][protein] for protein in self.proteins]
-            annotations = [a for a in annotations if a] #remove unannotated proteins
-            all_annotations = set([ann for prot_anns in annotations for ann in prot_anns])
-            
-            #coherent annotations show up in all proteins that a peptide maps to.
-            if annotations:
-                #we find the mutual intersection of all sets of annotations.
-                coherent = set(annotations.pop())
-                for prot_anns in annotations:
-                    coherent &= set(prot_anns)
-                self.coherent_annotations[ann_type] = coherent
-            else:
-                self.coherent_annotations[ann_type] = set()
-            
-            #incoherent annotations show up in only a subset of proteins a peptide maps to.
-            self.incoherent_annotations[ann_type] = all_annotations - self.coherent_annotations[ann_type]
+            if not ann_type == 'protein':
+                annotations = [protein_annotations[ann_type][protein] for protein in self.proteins]
+                annotations = [a for a in annotations if a] #remove unannotated proteins
+                all_annotations = set([ann for prot_anns in annotations for ann in prot_anns])
+                
+                #coherent annotations show up in all proteins that a peptide maps to.
+                if annotations:
+                    #we find the mutual intersection of all sets of annotations.
+                    coherent = set(annotations.pop())
+                    for prot_anns in annotations:
+                        coherent &= set(prot_anns)
+                    self.coherent_annotations[ann_type] = coherent
+                else:
+                    self.coherent_annotations[ann_type] = set()
+                
+                #incoherent annotations show up in only a subset of proteins a peptide maps to.
+                self.incoherent_annotations[ann_type] = all_annotations - self.coherent_annotations[ann_type]
             
         #add protein as an annotation 
         if len(self.proteins) == 1:
