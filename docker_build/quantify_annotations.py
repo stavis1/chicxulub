@@ -106,8 +106,9 @@ if args.organisms:
 #collect eggnog annotation information
 protein_annotations = {}
 for ann_type in options['annotation_classes']:
-    protein_annotation_map = {prot:anns.split(',') for prot, anns in zip(eggnog['#query'], eggnog[ann_type]) if anns != '-'}
-    protein_annotations[ann_type] = defaultdict(lambda: [], protein_annotation_map)    
+    if ann_type != 'protein':
+        protein_annotation_map = {prot:anns.split(',') for prot, anns in zip(eggnog['#query'], eggnog[ann_type]) if anns != '-'}
+        protein_annotations[ann_type] = defaultdict(lambda: [], protein_annotation_map)    
 
 #collect peptide information
 peptide_quants = pd.read_csv(args.peptides, sep = '\t')
