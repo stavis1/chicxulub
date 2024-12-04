@@ -84,8 +84,10 @@ class Peptide:
             
         #add protein as an annotation 
         if len(self.proteins) == 1:
-            self.coherent_annotations['protein'] = self.proteins
-        self.incoherent_annotations['protein'] = self.proteins
+            self.coherent_annotations['protein'] = set(self.proteins)
+        else:
+            self.coherent_annotations['protein'] = set()
+        self.incoherent_annotations['protein'] = set(self.proteins)
             
 #parse options file
 with open(args.toml, 'rb') as toml:
