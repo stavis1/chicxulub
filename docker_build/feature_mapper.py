@@ -146,9 +146,10 @@ psm_table = psm_table[psm_table['q-value'] < params['FDR']]
 
 #filter psms to ones that map to extant peptides
 observed_peptides = set([p.seq for p in peptides])
-psm_table = psm_table[[s in observed_peptides for s in psm_table['peptide']]]
+psm_table = psm_table[[re.search(r'\A[^\.]+\.((?:[A-Z](?:\[[^\]]+\])?)+)\.[^\.]+\Z',s).group(1) in observed_peptides for s in psm_table['peptide']]]
 
 #keep only best scoring PSM per scan
+psm_table['scan'] = [re.search(r'(\d+)_\d+_\d+\Z', n).group(1) for n in psm_table['PSMId']]
 psm_table = psm_table.sort_values('posterior_error_prob').drop_duplicates('scan').sort_index()
 
 #write filtered PSM and peptide tables
