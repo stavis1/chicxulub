@@ -135,25 +135,28 @@ feature_table = pd.read_csv(args.features, sep = '\t').replace(0, np.nan)
 fcols = ['rtStart', 'rtEnd', 'mz', 'intensityApex']
 features = [Feature(start, end, mz, intensity) for start, end, mz, intensity in zip(*[feature_table[c] for c in fcols])]
 
-#make psm objects
-psm_table = pd.read_csv(args.psms, sep = '\t')
-psm_table = psm_table[psm_table['q-value'] < params['FDR']]
-psms = [Psm(name, seq, pep) for name, seq, pep in zip(psm_table['PSMId'], psm_table['peptide'], psm_table['posterior_error_prob'])]
-
-#keep only best scoring PSM per scan
-scans = defaultdict(lambda: [])
-for psm in psms:
-    scans[psm.scan].append(psm)
-psms = [min(scan, key = lambda x: x.pep) for scan in scans.values()]
-
 #make peptide objects
 peptide_table = pd.read_csv(args.peptides, sep = '\t')
 peptide_table = peptide_table[peptide_table['q-value'] < params['FDR']]
 peptides = [Peptide(seq, prots) for seq, prots in zip(peptide_table['peptide'], peptide_table['proteinIds'])]
 
+#parse PSM data
+psm_table = pd.read_csv(args.psms, sep = '\t')
+psm_table = psm_table[psm_table['q-value'] < params['FDR']]
+
 #filter psms to ones that map to extant peptides
 observed_peptides = set([p.seq for p in peptides])
-psms = [psm for psm in psms if psm.seq in observed_peptides]
+psm_table = psm_table[[s in observed_peptides for s in psm_table['peptide']]]
+
+#keep only best scoring PSM per scan
+psm_table = psm_table.sort_values('posterior_error_prob').drop_duplicates('scan').sort_index()
+
+#write filtered PSM and peptide tables
+psm_table.to_csv(f'{args.psms}.filtered', sep = '\t', index = False)
+peptide_table.to_csv(f'{args.peptides}.filtered', sep = '\t', index = False)
+
+#make PSM objects
+psms = [Psm(name, seq, pep) for name, seq, pep in zip(psm_table['PSMId'], psm_table['peptide'], psm_table['posterior_error_prob'])]
 
 #set up data structures for fast lookup
 rt_starts = SortedList([(f.start, f) for f in features], key = lambda x: x[0])

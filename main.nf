@@ -38,7 +38,6 @@ process comet {
 
 process percolator {
     container 'stavisvols/percolator_for_pipeline:latest'
-    publishDir params.results_dir, mode: 'copy', pattern: '*.{psms,peptides}*'
     containerOptions "--bind $launchDir:/data/"
 
     input:
@@ -77,7 +76,8 @@ process dinosaur {
 
 process feature_mapper {
     container 'stavisvols/feature_mapper:latest'
-
+    publishDir params.results_dir, mode: 'copy', pattern: '*.filtered'
+    
     input:
     tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features)
 
