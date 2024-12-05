@@ -82,7 +82,7 @@ process feature_mapper {
     tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features)
 
     output:
-    tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features), path("${basename_peptides}.intensities"), path(options), path(faa)
+    tuple val(row), path(options), path(mzml), path(faa), path(pin), path("${basename}.psms.filtered"), path("${basename}.peptides.filtered"), path(features), path("${basename_peptides}.intensities"), path(options), path(faa)
 
     script:
     basename_peptides = row.identifier
