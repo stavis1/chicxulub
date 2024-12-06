@@ -232,6 +232,7 @@ process merge_quantified_annotations {
 workflow {    
     //make results directory
     file(params.results_dir).mkdir()
+    file(params.design).copyTo(params.results_dir)
 
     //parse the combined parameters file
     design = Channel.of(file(params.design)).splitCsv(header : true, sep : '\t', strip : true)
