@@ -46,7 +46,7 @@ for ann_type in options['annotation_classes']:
         newdata.columns = [f'{c}_{suffix}' for c in newdata.columns]
         data.append(newdata)
     data = pd.concat(data, axis = 1)
-    data.to_csv(f'{args.out}.{ann_type}.quantification', sep = '\t', index = False)
+    data.to_csv(f'{args.out}.{ann_type}.quantification', sep = '\t')
 
 #the peptide quantification files
 extension = re.compile(args.pep_extension)
