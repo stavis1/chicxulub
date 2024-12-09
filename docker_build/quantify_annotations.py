@@ -43,16 +43,18 @@ class Annotation:
         self.coherent = 0
         self.all = 0
         self.npeptides = 0
+        self.ncoherent = 0
     
     def add_intensity(self, val, is_coherent):
         if np.isfinite(val):
             self.npeptides += 1
             if is_coherent:
                 self.coherent += val
+                self.ncoherent += 1
             self.all += val
     
     def report(self):
-        return (self.name, self.coherent, self.all, self.npeptides)
+        return (self.name, self.coherent, self.ncoherent, self.all, self.npeptides)
 
 class Peptide:
     def __init__(self, sequence, intensity, proteins):
@@ -132,5 +134,5 @@ for ann_type in options['annotation_classes']:
 #write report files
 for ann_type in options['annotation_classes']:
     report = pd.DataFrame([ann.report() for ann in annotations[ann_type].values()],
-                          columns = ['annotation', 'coherent_intensity', 'all_intensity', 'N_peptides'])
+                          columns = ['annotation', 'coherent_intensity', 'N_coherent', 'all_intensity', 'N_all'])
     report.to_csv(f'{args.out}.{ann_type}.quants', sep = '\t', index = False)
