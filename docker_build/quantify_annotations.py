@@ -47,10 +47,10 @@ class Annotation:
     
     def add_intensity(self, val, is_coherent):
         if np.isfinite(val):
-            self.npeptides += 1
             if is_coherent:
                 self.coherent += val
                 self.ncoherent += 1
+            self.npeptides += 1
             self.all += val
     
     def report(self):
@@ -106,7 +106,6 @@ if args.organisms:
     organism_file = pd.read_csv(args.organisms, sep = '\t', header = None)
     organism_map = defaultdict(lambda : '-',
                                {header.split()[0]:org for header, org in zip(organism_file.iloc[:,0], organism_file.iloc[:,1])})
-    options['annotation_classes'] += ['organism']
     eggnog['organism'] = [organism_map[p] for p in eggnog['#query']]
 
 #collect eggnog annotation information
@@ -118,6 +117,7 @@ for ann_type in options['annotation_classes']:
 
 #collect peptide information
 peptide_quants = pd.read_csv(args.peptides, sep = '\t')
+total_intensity = np.nansum(peptide_quants['intensity'])
 peptides = [Peptide(s, i, p) for s,i,p in zip(peptide_quants['sequence'], peptide_quants['intensity'], peptide_quants['proteins'])]
 for peptide in peptides:
     peptide.annotate_self(protein_annotations)
@@ -134,5 +134,7 @@ for ann_type in options['annotation_classes']:
 #write report files
 for ann_type in options['annotation_classes']:
     report = pd.DataFrame([ann.report() for ann in annotations[ann_type].values()],
-                          columns = ['annotation', 'coherent_intensity', 'N_coherent', 'all_intensity', 'N_all'])
+                          columns = ['annotation', 'coherent_fraction', 'N_coherent', 'all_fraction', 'N_all'])
+    report['coherent_fraction'] = report['coherent_fraction']/total_intensity
+    report['all_fraction'] = report['all_fraction']/total_intensity
     report.to_csv(f'{args.out}.{ann_type}.quants', sep = '\t', index = False)
