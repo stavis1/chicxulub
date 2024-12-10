@@ -139,5 +139,5 @@ for ann_type in options['annotation_classes']:
         report['coherent_fraction'] = report['coherent_fraction']/total_intensity
         report['all_fraction'] = report['all_fraction']/total_intensity
     else:
-        report.columns = ['annotation', 'coherent_signal', 'N_coherent', 'all_signal', 'N_all']
+        report.columns = ['annotation', 'unique_signal', 'N_unique', 'all_signal', 'N_all']
     report.to_csv(f'{args.out}.{ann_type}.quants', sep = '\t', index = False)
