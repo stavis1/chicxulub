@@ -135,6 +135,9 @@ for ann_type in options['annotation_classes']:
 for ann_type in options['annotation_classes']:
     report = pd.DataFrame([ann.report() for ann in annotations[ann_type].values()],
                           columns = ['annotation', 'coherent_fraction', 'N_coherent', 'all_fraction', 'N_all'])
-    report['coherent_fraction'] = report['coherent_fraction']/total_intensity
-    report['all_fraction'] = report['all_fraction']/total_intensity
+    if ann_type != 'protein':
+        report['coherent_fraction'] = report['coherent_fraction']/total_intensity
+        report['all_fraction'] = report['all_fraction']/total_intensity
+    else:
+        report.columns = ['annotation', 'coherent_signal', 'N_coherent', 'all_signal', 'N_all']
     report.to_csv(f'{args.out}.{ann_type}.quants', sep = '\t', index = False)
