@@ -173,7 +173,7 @@ process eggnog_search {
     if [ -f /cache/$id/${faa_file}.emapper.annotations ]; then
         cp /cache/$id/${faa_file}.emapper.annotations ${faa_file}.emapper.annotations
     elif [ -e /cache/precomputed ]; then
-        cp /cache/precomputed/precomputed.emapper.annotations .
+        cp /cache/precomputed/precomputed.emapper.annotations ${faa_file}.emapper.annotations
     else
         eggnog_wrapper.py --task search --options $search_options --run_args '-i $faa_file -o ${faa_file} --output_dir ./ --data_dir $eggnog_database'
     fi
