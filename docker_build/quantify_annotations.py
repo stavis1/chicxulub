@@ -20,6 +20,7 @@ parser.add_argument('-m', '--organisms', action = 'store', required = False, def
                     help = 'A tab separated mapping between fasta headers and organism IDs.')
 args = parser.parse_args()
 
+import re
 import tomllib
 from collections import defaultdict
 import numpy as np
@@ -77,7 +78,12 @@ class Peptide:
                     coherent = set(annotations.pop())
                     for prot_anns in annotations:
                         coherent &= set(prot_anns)
-                    self.coherent_annotations[ann_type] = coherent
+                    
+                    #we want uniqueness rather that coherence for organism annotations.
+                    if ann_type == 'organism':
+                        self.coherent_annotations[ann_type] = coherent if len(coherent) == 1 else set()
+                    else:                       
+                        self.coherent_annotations[ann_type] = coherent
                 else:
                     self.coherent_annotations[ann_type] = set()
                 
@@ -98,8 +104,12 @@ with open(args.toml, 'rb') as toml:
 #read eggnog data
 eggnog = pd.read_csv(args.eggnog, skiprows = 4, sep = '\t')
 eggnog = eggnog[[not p.startswith('##') for p in eggnog['#query']]]
+
+#reformat problematic categories
 if 'COG_category' in options['annotation_classes']:
     eggnog['COG_category'] = [','.join(c) for c in eggnog['COG_category']]
+if 'KEGG_Pathway' in options['annotation_classes']:
+    eggnog['KEGG_Pathway'] = [','.join(re.findall(r'\d{5}', p)) for p in eggnog['KEGG_Pathway']]
 
 #add organism information to eggnog file
 if args.organisms:
