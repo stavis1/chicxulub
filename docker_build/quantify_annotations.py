@@ -109,7 +109,7 @@ eggnog = eggnog[[not p.startswith('##') for p in eggnog['#query']]]
 if 'COG_category' in options['annotation_classes']:
     eggnog['COG_category'] = [','.join(c) for c in eggnog['COG_category']]
 if 'KEGG_Pathway' in options['annotation_classes']:
-    eggnog['KEGG_Pathway'] = [','.join(re.findall(r'\d{5}', p)) for p in eggnog['KEGG_Pathway']]
+    eggnog['KEGG_Pathway'] = [','.join(set(f'map{a}' for a in re.findall(r'\d{5}', p))) for p in eggnog['KEGG_Pathway']]
 
 #add organism information to eggnog file
 if args.organisms:
