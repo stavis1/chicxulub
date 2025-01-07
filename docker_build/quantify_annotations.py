@@ -79,7 +79,7 @@ class Peptide:
                     for prot_anns in annotations:
                         coherent &= set(prot_anns)
                     
-                    #we want uniqueness rather that coherence for organism annotations.
+                    #we want uniqueness rather than coherence for organism annotations.
                     if ann_type == 'organism':
                         self.coherent_annotations[ann_type] = coherent if len(coherent) == 1 else set()
                     else:                       
