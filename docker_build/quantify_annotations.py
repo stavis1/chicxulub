@@ -91,7 +91,7 @@ class Peptide:
                 self.incoherent_annotations[ann_type] = all_annotations - self.coherent_annotations[ann_type]
             
         #add protein as an annotation 
-        if len(self.proteins) == 1:
+        if len(set(self.proteins)) == 1:
             self.coherent_annotations['protein'] = set(self.proteins)
         else:
             self.coherent_annotations['protein'] = set()
