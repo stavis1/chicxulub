@@ -42,7 +42,7 @@ for ann_type in options['annotation_classes']:
         newdata = pd.read_csv(f, sep = '\t')
         newdata.index = newdata['annotation']
         del newdata['annotation']
-        suffix = re.search(f'(.+)\\.intensities\\..+\\.{args.extension}\\Z', f).group(1)
+        suffix = re.search(f'([^\\\\/]+)\\.intensities\\..+\\.{args.extension}\\Z', f).group(1)
         newdata.columns = [f'{c}_{suffix}' for c in newdata.columns]
         data.append(newdata)
     data = pd.concat(data, axis = 1)
@@ -58,7 +58,7 @@ for f in pep_files:
     newdata = pd.read_csv(f, sep = '\t')
     newdata.index = newdata['sequence']
     del newdata['sequence']
-    suffix = re.search(r'[\\/]([^\\/\.]+)\.[^\\/]+\Z', f).group(1)
+    suffix = re.search(f'([^\\\\/]+)\\.intensities\\..+\\.{args.extension}\\Z', f).group(1)
     newdata.columns = [f'{c}_{suffix}' for c in newdata.columns]
     data.append(newdata)
 data = pd.concat(data, axis = 1)
