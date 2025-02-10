@@ -143,14 +143,17 @@ peptides = [Peptide(seq, prots) for seq, prots in zip(peptide_table['peptide'], 
 #parse PSM data
 psm_table = pd.read_csv(args.psms, sep = '\t')
 psm_table = psm_table[psm_table['q-value'] < params['FDR']]
+assert psm_table.shape[0] > 0
 
 #filter psms to ones that map to extant peptides
 observed_peptides = set([p.seq for p in peptides])
 psm_table = psm_table[[re.search(r'\A[^\.]+\.((?:[A-Z](?:\[[^\]]+\])?)+)\.[^\.]+\Z',s).group(1) in observed_peptides for s in psm_table['peptide']]]
+assert psm_table.shape[0] > 0
 
 #keep only best scoring PSM per scan
 psm_table['scan'] = [re.search(r'(\d+)_\d+_\d+\Z', n).group(1) for n in psm_table['PSMId']]
 psm_table = psm_table.sort_values('posterior_error_prob').drop_duplicates('scan').sort_index()
+assert psm_table.shape[0] > 0
 
 #write filtered PSM and peptide tables
 psm_table.to_csv(f'{args.psms}.filtered', sep = '\t', index = False)
