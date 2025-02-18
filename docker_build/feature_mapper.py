@@ -22,7 +22,6 @@ parser.add_argument('--output', action = 'store', required = True,
                     help = 'The name of the results file.')
 args = parser.parse_args()
 
-from collections import defaultdict
 from multiprocessing import Pool
 import re
 import tomllib
@@ -110,12 +109,24 @@ class Peptide():
     def calculate_intensity(self):
         self.intensity = np.sum([f.intensity for f in self.features])
     
+    def collect_feature_info(self):
+        charges = set(f.psms[0].charge for f in self.features)
+        report_str = ''
+        for charge in charges:
+            features = [f for f in self.features if f.psms[0].charge == charge]
+            intensity = np.sum([f.intensity for f in features])
+            width = np.mean([f.end - f.start for f in features])
+            report_str += f'{"_" if report_str else ""}{charge}:{intensity}:{width}'
+        self.feature_info = report_str
+    
     def report(self):
         self.remove_bad_features()
         self.calculate_intensity()
+        self.collect_feature_info()
         return (self.seq, 
                 self.intensity,
-                self.prots)
+                self.prots,
+                self.feature_info)
 
 def attach_features(psm):
     started_before = set(f[1] for f in rt_starts.irange((psm.rt - max_Δrt, ), (psm.rt,)))
@@ -185,6 +196,6 @@ for psm in psms:
 
 #report quantified peptides
 intensities = pd.DataFrame((pep.report() for pep in peptides),
-                           columns = ('sequence', 'intensity', 'proteins'))
+                           columns = ('sequence', 'intensity', 'proteins', 'ionoforms_charge:intensity:width'))
 intensities = intensities[intensities['intensity'] > 0.0]
 intensities.to_csv(args.output, sep = '\t', index = False)
