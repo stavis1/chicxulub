@@ -2,19 +2,16 @@ params.results_dir = "$launchDir/results"
 
 process params_parser {
     container 'stavisvols/params_parser:latest'
-    containerOptions "--bind $launchDir:/data/"
 
     input:
-    val row
+    tuple val(row), path(options), path(spectra), path(sequences)
 
     output:
-    tuple val(row), path('*_params'), path("$row.spectra"), path("$row.sequences")
+    tuple val(row), path('*_params'), path(spectra), path(sequences)
 
     script:
     """
-    cp /data/$row.spectra ./
-    cp /data/$row.sequences ./
-    python /parser/options_parser.py --params /data/${row.options}
+    python /parser/options_parser.py --params ${row.options}
     """
 }
 
@@ -235,11 +232,12 @@ workflow {
     file(params.design).copyTo(params.results_dir)
 
     //parse the combined parameters file
-    design = Channel.of(file(params.design)).splitCsv(header : true, sep : '\t', strip : true)
-    params_parser(design)
+    params = Channel.of(file(params.design)).splitCsv(header : true, sep : '\t', strip : true)
+        | map {r -> tuple(r, file(r.options), file(r.spectra), file(r.sequences))}
+        | params_parser
 
     //download the database files for each unique required eggnog DB
-    eggnog_db_list = params_parser.out 
+    eggnog_db_list = params 
         | map {row, files, mzml, faa -> 
             dl_params = files.find {it.getName() == 'download_eggnog_data_params'}
             [dl_params.text.digest('MD2'), dl_params]
@@ -249,13 +247,13 @@ workflow {
         | toList
 
     //annotate each .faa + db combination using eggnog
-    annotated_faas = collect_eggnog_search_jobs(params_parser.out, eggnog_db_list)
+    annotated_faas = collect_eggnog_search_jobs(params, eggnog_db_list)
         | unique {hash, db, faa, options -> hash}
         | eggnog_search
         | toList
 
     //identify peptides
-    comet(params_parser.out)
+    comet(params)
     percolator(comet.out)
     
     //quantify peptides
