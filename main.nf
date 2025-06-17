@@ -182,7 +182,7 @@ process qauantify_annotations {
     containerOptions "--bind $launchDir:/data/"
 
     input:
-    tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features), path(intensities), val(option_paths), val(faa_path)
+    tuple val(row), path(options), path(mzml), path(faa), path(pin), path(psms), path(peptides), path(features), path(intensities), val(option_paths), val(faa_path), path(organism_map)
     val annotated_faas
 
     output:
@@ -201,9 +201,8 @@ process qauantify_annotations {
     annotations = annotated_faas.find {it[0] == id}[1]
     
     """
-    if [ -f "/data/${row.organism_map}" ]; then
-        cp /data/${row.organism_map} organism_map
-        python /scripts/quantify_annotations.py --eggnog $annotations --peptides $intensities --toml eggnog_quantification_params --out $intensities --organisms organism_map
+    if [ -s $organism_map ]; then
+        python /scripts/quantify_annotations.py --eggnog $annotations --peptides $intensities --toml eggnog_quantification_params --out $intensities --organisms $organism_map
     else
         python /scripts/quantify_annotations.py --eggnog $annotations --peptides $intensities --toml eggnog_quantification_params --out $intensities
     fi
@@ -253,15 +252,15 @@ workflow {
         | toList
 
     //identify peptides
-    comet(params)
-    percolator(comet.out)
-    
+    mapped_features = comet(params)
+        | percolator
     //quantify peptides
-    dinosaur(percolator.out)
-    feature_mapper(dinosaur.out)
-
+        | dinosaur
+        | feature_mapper
+        | map {data -> data + file(data[0].organism_map).isEmpty() ? file('/dev/null') : file(data[0].organism_map)}
+ 
     //quantify annotations and merge results
-    qauantify_annotations(feature_mapper.out, annotated_faas)
+    qauantify_annotations(mapped_features, annotated_faas)
         | flatten
         | unique { it.getName() }
         | collect
