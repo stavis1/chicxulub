@@ -257,7 +257,7 @@ workflow {
     //quantify peptides
         | dinosaur
         | feature_mapper
-        | map {data -> data + file(data[0].organism_map).isEmpty() ? file('/dev/null') : file(data[0].organism_map)}
+        | map {data -> data + [file(data[0].organism_map)]}
  
     //quantify annotations and merge results
     qauantify_annotations(mapped_features, annotated_faas)
