@@ -1,6 +1,7 @@
 process convert_raw_file {
     container 'stavisvols/psp_sipros_mono:latest'
     stageInMode 'link'
+    shell '/bin/bash', '-u'
 
     input:
     tuple val(row), path(options), path(raw_file), path(faa)
