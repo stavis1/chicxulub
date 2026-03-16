@@ -1,4 +1,4 @@
-process qauantify_annotations {
+process quantify_annotations {
     container 'stavisvols/quantify_annotations:latest'
     containerOptions "--bind $launchDir:/data/"
 
@@ -53,7 +53,7 @@ workflow quantify {
     
     main:
     //quantify annotations and merge results
-    qauantify_annotations(mapped_features, annotated_faas)
+    quantify_annotations(mapped_features, annotated_faas)
         | flatten
         | unique { it.getName() }
         | collect
