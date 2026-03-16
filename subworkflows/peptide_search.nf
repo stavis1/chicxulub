@@ -5,7 +5,7 @@ process convert_raw_file {
     input:
     tuple val(row), path(options), path(raw_file), path(faa)
 
-    input:
+    output:
     tuple val(row), path(options), path('*.mzML'), path(faa)
 
     script:
