@@ -1,3 +1,23 @@
+process convert_raw_file {
+    container 'stavisvols/psp_sipros_mono:latest'
+    stageInMode 'link'
+
+    input:
+    tuple val(row), path(options), path(raw_file), path(faa)
+
+    input:
+    tuple val(row), path(options), path('*.mzML'), path(faa)
+
+    script:
+    """
+    if [[ ( $raw_file == *.raw ) || ( $raw_file == *.RAW ) ]]
+    then
+        (timeout 10m mono /software/ThermoRawFileParser.exe -i $raw_file -o ./ -f 2; exit 0)
+        ls *.mzML
+    fi
+    """
+}
+
 process comet {
     container 'stavisvols/comet_for_pipeline:latest'
 
@@ -83,7 +103,8 @@ workflow peptide_search {
     
     main:
     //identify peptides
-    mapped_features = comet(params)
+    mapped_features = convert_raw_file(params)
+        | comet
         | percolator
     //quantify peptides
         | dinosaur
