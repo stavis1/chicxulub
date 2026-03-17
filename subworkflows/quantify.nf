@@ -53,6 +53,9 @@ workflow quantify {
     
     main:
     //quantify annotations and merge results
+    mapped_features = mapped_features
+        | map {data -> data + [file(data[0].organism_map)]}
+    
     quantify_annotations(mapped_features, annotated_faas)
         | flatten
         | unique { it.getName() }

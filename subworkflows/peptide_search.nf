@@ -110,7 +110,6 @@ workflow peptide_search {
     //quantify peptides
         | dinosaur
         | feature_mapper
-        | map {data -> data + [file(data[0].organism_map)]}
 
     emit:
     mapped_features
